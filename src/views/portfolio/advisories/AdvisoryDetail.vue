@@ -7,51 +7,51 @@
     </b-card>
 
     <b-tabs class="body-bg-color">
-      <b-tab title="Overview">
+      <b-tab title="$t('admin.overview')">
         <b-card>
           <table>
             <tr>
-              <th>Name</th>
+              <th>{{ $t('admin.name') }}</th>
               <td>
                 {{ advisory.name }}
               </td>
             </tr>
             <tr>
-              <th>Tracking ID</th>
+              <th>{{ $t('admin.tracking_id') }}</th>
               <td>{{ advisory.trackingID }}</td>
             </tr>
             <tr>
-              <th>Version</th>
+              <th>{{ $t('admin.version') }}</th>
               <td>{{ advisory.trackingVersion }}</td>
             </tr>
             <tr>
-              <th>Last Fetched</th>
+              <th>{{ $t('admin.last_fetched') }}</th>
               <td>{{ formatDate(advisory.lastFetched) }}</td>
             </tr>
             <tr>
-              <th>URL</th>
+              <th>{{ $t('admin.url') }}</th>
               <td>
                 <a :href="advisory.url" target="_blank">{{ advisory.url }}</a>
               </td>
             </tr>
           </table>
         </b-card>
-        <b-card title="Publisher">
+        <b-card title="$t('admin.publisher')">
           <table>
             <tr>
-              <th>Name</th>
+              <th>{{ $t('admin.name') }}</th>
               <td>
                 {{ doc.document.publisher.name }}
               </td>
             </tr>
             <tr>
-              <th>Namespace</th>
+              <th>{{ $t('admin.namespace') }}</th>
               <td>
                 {{ doc.document.publisher.namespace }}
               </td>
             </tr>
             <tr>
-              <th>Category</th>
+              <th>{{ $t('admin.category') }}</th>
               <td>
                 {{ doc.document.publisher.category }}
               </td>
@@ -69,7 +69,7 @@
         </b-card>
         <pre>{{ JSON.stringify(doc, null, 2) }}</pre>
       </b-tab>
-      <b-tab title="Affected Projects">
+      <b-tab title="$t('admin.affected_projects')">
         <bootstrap-table
           ref="table_projects"
           :columns="projectsColumns"
@@ -77,7 +77,7 @@
           :options="options"
         />
       </b-tab>
-      <b-tab title="Vulnerabilities">
+      <b-tab title="$t('admin.vulnerabilities')">
         <bootstrap-table
           ref="table_vulnerabilities"
           :columns="vulnerabilitiesColumns"
@@ -85,7 +85,7 @@
           :options="options"
         />
       </b-tab>
-      <b-tab title="Document History">
+      <b-tab title="$t('admin.document_history')">
         <b-card
           :title="value.date"
           v-for="(value, key) in doc.document.tracking.revision_history"
@@ -114,7 +114,7 @@ export default {
       doc: {},
       projectsColumns: [
         {
-          title: 'Name',
+          title: this.$t('admin.name'),
           field: 'name',
           sortable: true,
           formatter(value, row, index) {
@@ -125,14 +125,14 @@ export default {
           },
         },
         {
-          title: 'Version',
+          title: this.$t('admin.version'),
           field: 'version',
           class: 'tight',
           sortable: true,
           width: '350px',
         },
         {
-          title: 'Description',
+          title: this.$t('admin.description'),
           field: 'desc',
           align: 'center',
           sortable: true,
@@ -140,7 +140,7 @@ export default {
       ],
       vulnerabilitiesColumns: [
         {
-          title: 'ID',
+          title: this.$t('admin.id'),
           field: 'vulnId',
           sortable: true,
           formatter(value, row, index) {
@@ -151,14 +151,14 @@ export default {
           },
         },
         {
-          title: 'Version',
+          title: this.$t('admin.version'),
           field: 'version',
           class: 'tight',
           sortable: true,
           width: '350px',
         },
         {
-          title: 'Description',
+          title: this.$t('admin.description'),
           field: 'desc',
           align: 'center',
           sortable: true,

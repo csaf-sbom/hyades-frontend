@@ -21,7 +21,7 @@ export default {
     return {
       taColumns: [
         {
-          title: 'Component',
+          title: this.$t('admin.component'),
           field: 'name',
           sortable: true,
           formatter: (value, row, index) => {
@@ -41,18 +41,18 @@ export default {
           },
         },
         {
-          title: 'Version',
+          title: this.$t('admin.version'),
           field: 'version',
           class: 'tight',
           sortable: true,
         },
         {
-          title: 'Group',
+          title: this.$t('admin.group'),
           field: 'group',
           sortable: true,
         },
         {
-          title: 'Confidence',
+          title: this.$t('admin.confidence'),
           field: 'confidence',
           sortable: true,
           formatter: (cell) => {

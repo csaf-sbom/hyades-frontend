@@ -50,7 +50,7 @@ export default {
     return {
       columns: [
         {
-          title: 'Name',
+          title: this.$t('admin.name'),
           field: 'name',
           sortable: true,
           formatter(value, row, index) {
@@ -61,19 +61,19 @@ export default {
           },
         },
         {
-          title: 'URL',
+          title: this.$t('admin.url'),
           field: 'url',
           class: 'tight',
           sortable: true,
           width: '350px',
         },
         {
-          title: 'Projects',
+          title: this.$t('admin.projects'),
           field: 'affectedProjects',
           sortable: true,
         },
         {
-          title: 'Matches',
+          title: this.$t('admin.matches'),
           field: 'affectedComponents',
           sortable: true,
         },
