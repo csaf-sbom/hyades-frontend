@@ -59,10 +59,6 @@ export default {
             return `${(cell * 100).toFixed(0)}%`;
           },
         },
-        /*{
-          title: 'Vulnerability',
-          field: 'vulnerability',
-        },*/
       ],
       taData: [],
       taOptions: {
@@ -80,23 +76,6 @@ export default {
         icons: {
           refresh: 'fa-refresh',
         },
-        /*detailView: true,
-        detailViewIcon: true,
-        detailViewByClick: false,
-        detailFormatter: (index, row) => {
-          return (
-            row &&
-            this.vueFormatter({
-              i18n,
-              propsData: {
-                finding: row,
-                projectUuid: this.uuid,
-              },
-              ...FindingAudit,
-            })
-          );
-        },
-        onExpandRow: this.vueFormatterInit,*/
       },
     };
   },

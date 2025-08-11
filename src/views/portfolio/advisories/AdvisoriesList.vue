@@ -34,7 +34,6 @@ export default {
       this.$router.push({ name: '/advisory', params: { id: row.name } });
     },
     apiUrl: function () {
-      //TODO: find correct url
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}`;
       return url;
     },

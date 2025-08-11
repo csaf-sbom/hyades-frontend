@@ -6,11 +6,6 @@
       :data="data"
       :options="options"
     />
-    <!--<b-button size="md" variant="outline-primary" @click="handleSelected">
-      <span class="fa fa-plus"></span>
-      Add audit details
-    </b-button>
-    <project-advisories-add-info-modal :ids="rows" />-->
   </div>
 </template>
 
@@ -43,11 +38,6 @@ export default {
         dataOff: '\u2715',
       },
       columns: [
-        /*{
-          title: 'Select',
-          field: 'select',
-          checkbox: true,
-        },*/
         {
           field: 'name',
           title: this.$t('message.advisory'),
@@ -64,11 +54,6 @@ export default {
           title: this.$t('message.analyzer'),
           sortable: true,
         },
-        /*{
-          field: 'documentId',
-          title: this.$t('message.matchpercentage'),
-          sortable: true,
-        },*/
         {
           field: 'findingsPerDoc',
           title: this.$t('message.affected_components'),

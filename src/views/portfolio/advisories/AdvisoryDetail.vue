@@ -190,7 +190,6 @@ export default {
       return date.toLocaleString();
     },
     apiUrl: function () {
-      //TODO: find correct url
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/${this.advisoryId}`;
       return url;
     },

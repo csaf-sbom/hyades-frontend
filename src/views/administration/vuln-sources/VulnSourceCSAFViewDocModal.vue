@@ -6,17 +6,16 @@
     no-stacking
     :title="title"
   >
-
     <div>
       <vue-json-pretty :data="content" />
     </div>
 
-    <hr>
+    <hr />
 
     <template v-slot:modal-footer="{ cancel }">
       <b-button size="md" variant="secondary" @click="cancel()">{{
-          $t('message.close')
-        }}</b-button>
+        $t('message.close')
+      }}</b-button>
     </template>
   </b-modal>
 </template>

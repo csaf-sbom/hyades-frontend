@@ -79,8 +79,7 @@ export default {
   },
   methods: {
     validateInput(event) {
-      console.log("change event called "+event)
-      // TODO trigger validation after debounce event
+      // TODO: Call validation api
     },
     createCsafSource: function () {
       let url ='';
