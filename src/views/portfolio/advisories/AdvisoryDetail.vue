@@ -7,7 +7,7 @@
     </b-card>
 
     <b-tabs class="body-bg-color">
-      <b-tab title="$t('admin.overview')">
+      <b-tab :title="$t('admin.overview')">
         <b-card>
           <table>
             <tr>
@@ -36,7 +36,7 @@
             </tr>
           </table>
         </b-card>
-        <b-card title="$t('admin.publisher')">
+        <b-card :title="$t('admin.publisher')">
           <table>
             <tr>
               <th>{{ $t('admin.name') }}</th>
@@ -69,7 +69,7 @@
         </b-card>
         <pre>{{ JSON.stringify(doc, null, 2) }}</pre>
       </b-tab>
-      <b-tab title="$t('admin.affected_projects')">
+      <b-tab :title="$t('admin.affected_projects')">
         <bootstrap-table
           ref="table_projects"
           :columns="projectsColumns"
@@ -77,7 +77,7 @@
           :options="options"
         />
       </b-tab>
-      <b-tab title="$t('admin.vulnerabilities')">
+      <b-tab :title="$t('admin.vulnerabilities')">
         <bootstrap-table
           ref="table_vulnerabilities"
           :columns="vulnerabilitiesColumns"
@@ -85,7 +85,7 @@
           :options="options"
         />
       </b-tab>
-      <b-tab title="$t('admin.document_history')">
+      <b-tab :title="$t('admin.document_history')">
         <b-card
           :title="value.date"
           v-for="(value, key) in doc.document.tracking.revision_history"
