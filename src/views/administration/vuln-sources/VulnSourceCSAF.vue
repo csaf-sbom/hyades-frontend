@@ -319,7 +319,7 @@ export default {
           },
         },
         {
-          title: 'Publisher',
+          title: 'Publisher Namespace',
           field: 'publisherNamespace',
           sortable: true,
         },
