@@ -67,6 +67,37 @@
             {{ value.text }}
           </b-card-text>
         </b-card>
+        <b-card :title="$t('admin.statistics')">
+          <table>
+            <tr>
+              <th>Matches</th>
+              <td>{{ nMatches }}</td>
+            </tr>
+            <tr>
+              <th>With status set</th>
+              <td>
+                <div style="display: flex; align-items: center">
+                  <span>{{ nStatus }}</span>
+                  <div
+                    style="
+                    width: 100%;
+                    background-color: #e0e0e0;
+                    margin-left: 10px;
+                  "
+                  >
+                    <div
+                      :style="{
+                      width: (nStatus / nMatches) * 100 + '%',
+                      backgroundColor: '#4caf50',
+                      height: '20px',
+                    }"
+                    ></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </b-card>
         <pre>{{ JSON.stringify(doc, null, 2) }}</pre>
       </b-tab>
       <b-tab :title="$t('admin.affected_projects')">
