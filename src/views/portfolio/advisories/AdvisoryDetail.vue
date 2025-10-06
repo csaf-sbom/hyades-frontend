@@ -117,7 +117,13 @@
         />
       </b-tab>
       <b-tab :title="$t('admin.document_history')">
-        <b-card
+        <bootstrap-table
+          ref="table_history"
+          :columns="historyColumns"
+          :data="historyData"
+          :options="historyOptions"
+        />
+      <!--  <b-card
           :title="value.date"
           v-for="(value, key) in doc.document.tracking.revision_history"
           :key="key"
@@ -125,7 +131,7 @@
           <b-card-text>
             {{ value.summary }}
           </b-card-text>
-        </b-card>
+        </b-card> -->
       </b-tab>
     </b-tabs>
   </div>
@@ -197,6 +203,46 @@ export default {
       ],
       affectedProjects: [],
       vulnerabilities: [],
+      historyColumns: [
+        {
+          //date
+          title: this.$t('message.date'),
+          field: 'date',
+          sortable: true,
+        },
+        {
+          //version
+          title: this.$t('admin.version'),
+          field: 'version',
+          class: 'tight',
+          sortable: true,
+          width: '350px',
+        },
+        {
+          //summary
+          title: this.$t('message.summary'),
+          field: 'summary',
+          align: 'center',
+          sortable: true,
+        },
+      ],
+      historyData: [],
+      historyOptions: {
+        search: true,
+        showColumns: true,
+        showRefresh: true,
+        pagination: true,
+        sidePagination: 'client',
+        queryParamsType: 'pageSize',
+        pageList: '[10, 25, 50, 100]',
+        pageSize: 10,
+        silentSort: false,
+        sortName: 'version',
+        sortOrder: 'desc',
+        icons: {
+          refresh: 'fa-refresh',
+        },
+      },
       options: {
         search: true,
         showColumns: true,
@@ -238,6 +284,13 @@ export default {
         this.vulnerabilities = response.data.vulnerabilities;
         EventBus.$emit('addCrumb', this.advisory.name);
         this.$title = this.advisory.name;
+        this.historyData = this.doc.document.tracking.revision_history.map(
+          (item) => ({
+            date: item.date,
+            version: item.version,
+            summary: item.summary,
+          }),
+        );
       });
     },
     routeTo(path) {
