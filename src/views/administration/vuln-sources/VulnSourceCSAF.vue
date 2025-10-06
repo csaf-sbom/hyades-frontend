@@ -353,12 +353,13 @@ export default {
           formatter: (value, row) => {
             const allRows = this.$refs.table_documents.getData();
             const sameNameDocs = allRows.filter((doc) => doc.name === row.name);
+            const formatVersion = (version) => Number(version.replace(/\./g, ''));
             const maxVersion = Math.max(
               ...sameNameDocs.map(
-                (doc) => Number(doc.trackingVersion) || -Infinity,
+                (doc) => formatVersion(doc.trackingVersion) || -Infinity,
               ),
             );
-            return Number(row.trackingVersion) === maxVersion ? 'Yes' : 'No';
+            return formatVersion(row.trackingVersion) === maxVersion ? 'Yes' : 'No';
           },
         },
         {
