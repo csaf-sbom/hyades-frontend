@@ -209,6 +209,18 @@ export default {
           title: this.$t('message.date'),
           field: 'date',
           sortable: true,
+          formatter: (cell) => {
+            const date = new Date(cell);
+            const options = {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            };
+            return date.toLocaleString('de-DE', options).replace(',', '');
+          },
         },
         {
           //version
@@ -287,7 +299,7 @@ export default {
         this.historyData = this.doc.document.tracking.revision_history.map(
           (item) => ({
             date: item.date,
-            version: item.version,
+            version: item.number,
             summary: item.summary,
           }),
         );
