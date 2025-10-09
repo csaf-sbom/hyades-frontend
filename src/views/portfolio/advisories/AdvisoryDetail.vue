@@ -330,29 +330,7 @@ export default {
     this.initializeData();
   },
   mounted() {
-    /*try {
-      if (this.$route.params.componentUuids) {
-        this.$refs.dependencygraph.active = true;
-      } else {
-        this.getTabFromRoute().active = true;
-      }
-    } catch (e) {
-      this.$toastr.e(this.$t('condition.forbidden'));
-      this.$router.replace({ path: '/projects/' + this.uuid });
-
-      // TODO activate appropriate tab this.$refs.overview.active = true;
-    }*/
-    //this.refreshTable();
     this.loadData();
-    this.getStats();
-  },
-  refreshTable: function () {
-    //TODO uncomment when api url available
-    /* this.$refs.table_projects.refresh({
-         url: this.apiUrl(),
-         pageNumber: 1,
-         silent: true,
-       });*/
   },
   destroyed() {
     EventBus.$emit('crumble');
