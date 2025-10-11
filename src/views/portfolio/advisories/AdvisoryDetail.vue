@@ -70,30 +70,13 @@
         <b-card :title="$t('admin.statistics')">
           <table>
             <tr>
-              <th>Matches</th>
-              <td>{{ nMatches }}</td>
+              <th>Affected Projects</th>
+              <td>{{ nProjects }}</td>
             </tr>
             <tr>
-              <th>With status set</th>
+              <th>Affected Components</th>
               <td>
-                <div style="display: flex; align-items: center">
-                  <span>{{ nStatus }}</span>
-                  <div
-                    style="
-                    width: 100%;
-                    background-color: #e0e0e0;
-                    margin-left: 10px;
-                  "
-                  >
-                    <div
-                      :style="{
-                      width: (nStatus / nMatches) * 100 + '%',
-                      backgroundColor: '#4caf50',
-                      height: '20px',
-                    }"
-                    ></div>
-                  </div>
-                </div>
+                {{ nComponents }}
               </td>
             </tr>
           </table>
@@ -144,8 +127,8 @@ import EventBus from '../../../shared/eventbus';
 export default {
   data() {
     return {
-      nMatches: 0,
-      nStatus: 0,
+      nProjects: 0,
+      nComponents: 0,
       advisoryId: null,
       advisory: {},
       doc: {},
@@ -289,8 +272,8 @@ export default {
     loadData: function () {
       this.axios.get(this.apiUrl()).then((response) => {
         this.advisory = response.data.entity;
-        this.nMatches = response.data.findingsTotal;
-        this.nStatus = response.data.findingsMarked;
+        this.nProjects = response.data.affectedProjects.length;
+        this.nComponents = response.data.numAffectedComponents;
         this.doc = JSON.parse(response.data.entity.content);
         this.affectedProjects = response.data.affectedProjects;
         this.vulnerabilities = response.data.vulnerabilities;
