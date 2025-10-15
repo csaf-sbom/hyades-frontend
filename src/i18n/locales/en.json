@@ -217,7 +217,6 @@
     "npm": "NPM",
     "nuget": "NuGet",
     "nvd": "NVD",
-    "nvd_request_api_key_help": "How do I get an API key?",
     "oidc_group_created": "OpenID Connect group created",
     "oidc_group_deleted": "OpenID Connect group deleted",
     "oidc_group_name": "Group Name",
@@ -296,8 +295,11 @@
     "roles": "Roles",
     "save": "Save",
     "scope": "Scope",
+<<<<<<< HEAD
     "select_ecosystem": "Select Ecosystems",
     "select_file": "Select File",
+=======
+>>>>>>> origin/main
     "select_ldap_group": "Select LDAP Group",
     "select_oidc_group": "Select OpenID Connect Group",
     "select_permission": "Select permission",
@@ -359,6 +361,7 @@
     "vulnerability_scans": "Vulnerability Scans",
     "vulnsource_alias_sync_enable": "Enable vulnerability alias synchronization",
     "vulnsource_alias_sync_enable_tooltip": "Alias data can help in identifying identical vulnerabilities across multiple databases. If the source provides this data, synchronize it with Dependency-Track's database.",
+<<<<<<< HEAD
     "vulnsource_csaf_advisories_enable": "Enable CSAF Advisories",
     "vulnsource_csaf_base_url": "CSAF Base URL",
     "vulnsource_github_advisories_desc": "GitHub Advisories (GHSA) is a database of CVEs and GitHub-originated security advisories affecting the open source world. Dependency-Track integrates with GHSA by mirroring advisories via GitHub's public GraphQL API. The mirror is refreshed daily, or upon restart of the Dependency-Track instance. A personal access token (PAT) is required in order to authenticate with GitHub, but no scopes need to be assigned to it.",
@@ -370,6 +373,8 @@
     "vulnsource_osv_advisories_enable": "Select ecosystem to enable Google OSV Advisory mirroring",
     "vulnsource_osv_alias_sync_warning": "OSV may report non-identical vulnerabilities as aliases. Proceed with caution.",
     "vulnsource_osv_base_url": "OSV Base URL",
+=======
+>>>>>>> origin/main
     "welcome_message": "Welcome Message",
     "welcome_message_desc": "Customize the welcome message that appears on the start page of Dependency-Track before users sign in.",
     "welcome_message_enable": "Enable welcome message",
