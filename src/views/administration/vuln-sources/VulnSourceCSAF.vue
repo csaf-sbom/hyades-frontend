@@ -175,7 +175,6 @@
       </div>
     </b-card-body>
     <b-card-footer></b-card-footer>
-    <ecosystem-modal v-on:selection="updateEcosystem" />
     <vuln-source-c-s-a-f-add v-on:refreshTable="refreshBothCsafSourcesTables" />
     <vuln-source-c-s-a-f-compare
       :leftTitle="compareLeftTitle"
