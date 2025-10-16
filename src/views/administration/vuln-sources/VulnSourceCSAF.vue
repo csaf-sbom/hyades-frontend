@@ -194,7 +194,6 @@
 <script>
 import { Switch as cSwitch } from '@coreui/vue';
 import configPropertyMixin from '../mixins/configPropertyMixin';
-import EcosystemModal from './EcosystemModal';
 import VulnSourceCSAFAdd from './VulnSourceCSAFAddModal.vue';
 import ActionableListGroupItem from '../../components/ActionableListGroupItem.vue';
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
@@ -213,7 +212,6 @@ export default {
   },
   components: {
     cSwitch,
-    EcosystemModal,
     VulnSourceCSAFAdd,
     ActionableListGroupItem,
     BValidatedInputGroupFormInput,
@@ -910,20 +908,6 @@ export default {
         pageNumber: 1,
         silent: true,
       });
-    },
-    removeEcosystem: function (ecosystem) {
-      this.enabledEcosystems = this.enabledEcosystems.filter(
-        (e) => e !== ecosystem,
-      );
-      this.vulnsourceEnabled = this.enabledEcosystems.length !== 0;
-    },
-    updateEcosystem: function (ecosystems) {
-      this.$root.$emit('bv::hide::modal', 'ecosystemModal');
-      for (let i = 0; i < ecosystems.length; i++) {
-        let ecosystem = ecosystems[i];
-        this.enabledEcosystems.push(ecosystem.name);
-      }
-      this.vulnsourceEnabled = this.enabledEcosystems.length !== 0;
     },
     saveConfiguration: function () {
       this.updateConfigProperties([
