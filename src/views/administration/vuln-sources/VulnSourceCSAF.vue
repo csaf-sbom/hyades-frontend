@@ -497,6 +497,7 @@ export default {
                 name: row.name,
                 surl: row.url,
                 enabled: row.enabled,
+                lastFetched: row.lastFetched,
                 labelIcon: {
                   dataOn: '\u2713',
                   dataOff: '\u2715',
@@ -530,6 +531,7 @@ export default {
                     url: this.surl,
                     name: this.name,
                     enabled: this.enabled,
+                    lastFetched: this.lastFetched,
                   })
                   .then((response) => {
                     this.csafEntry = response.data;
@@ -653,6 +655,7 @@ export default {
                 name: row.name,
                 url: row.url,
                 enabled: row.enabled,
+                lastFetched: row.lastFetched,
                 labelIcon: {
                   dataOn: '\u2713',
                   dataOff: '\u2715',
@@ -686,6 +689,7 @@ export default {
                     url: this.url,
                     name: this.name,
                     enabled: this.enabled,
+                    lastFetched: this.lastFetched,
                   })
                   .then((response) => {
                     this.csafEntry = response.data;
