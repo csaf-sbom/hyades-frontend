@@ -1,8 +1,6 @@
 <template>
   <b-card no-body :header="header">
     <b-card-body>
-      <h1>CSAF</h1>
-      <hr />
       <c-switch
         color="primary"
         id="vulnsourceEnabled"
@@ -249,6 +247,7 @@ export default {
           title: 'ID',
           field: 'id',
           sortable: true,
+          visible: false,
         },
         {
           title: 'Name',
@@ -263,7 +262,6 @@ export default {
           field: 'url',
           class: 'tight',
           sortable: true,
-          width: '350px',
         },
         {
           title: 'Read',
@@ -274,7 +272,7 @@ export default {
           title: 'Actions',
           field: 'actions',
           formatter: (value, row) => {
-            return `<button class="btn btn-primary" id="rec-${row.id}" >  <span class="fa fa-plus"></span> Add</button>`;
+            return `<button class="btn btn-primary" id="rec-${row.id}"> <span class="fa fa-plus"></span> Add</button>`;
           },
         },
       ],
@@ -395,6 +393,7 @@ export default {
           title: 'ID',
           field: 'id',
           class: 'tight',
+          visible: false,
           sortable: true,
         },
         {
@@ -402,6 +401,7 @@ export default {
           field: 'name',
           class: 'tight',
           sortable: true,
+          width: '180px',
           formatter: (value, row) => {
             return row.new === 'New' ? `${value} *` : value;
           },
@@ -411,6 +411,7 @@ export default {
           field: 'url',
           class: 'tight',
           sortable: true,
+          width: '420px',
         },
         {
           title: 'Last fetched',
@@ -428,10 +429,14 @@ export default {
         {
           title: this.$t('admin.enabled'),
           field: 'enabled',
-          class: 'tight',
+          class: 'tight text-center',
+          align: 'center',
+          width: '80px',
           sortable: true,
           formatter(value, row, index) {
-            return value === true ? '<i class="fa fa-check-square-o" />' : '';
+            return value === true
+              ? '<i class="fa fa-check-square-o" aria-label="enabled" />'
+              : '';
           },
         },
       ],
@@ -463,22 +468,20 @@ export default {
             i18n,
             template: `
                 <b-row class="expanded-row">
-                  <b-col sm="6">
-                    <b-validated-input-group-form-input
-                      id="surl" :label="$t('admin.url')"
-                      input-group-size="mb-3" rules="required|domainOrUrl"
-                      type="url" v-model="surl"
-                      autofocus="true"
-                    />
-                  </b-col>
-                  <b-col sm="6">
-                    <div>
-                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{$t('admin.enabled')}}
+                  <b-col sm="12">
+                    <b-form-group :label="$t('admin.name')">
+                      <b-form-input type="text" v-model="name" required />
+                    </b-form-group>
+                    <b-form-group :label="$t('admin.url')">
+                      <b-form-input type="url" v-model="surl" required />
+                    </b-form-group>
+                    <div class="mb-2">
+                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" /> {{$t('admin.enabled')}}
                     </div>
-                    <div style="text-align:right">
-                       <b-button variant="outline-danger" @click="deleteCsafSource">Delete CSAF source</b-button>
-                       <b-button variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
-                       <b-button variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
+                    <div class="text-right">
+                      <b-button variant="outline-danger" @click="deleteCsafSource">Delete CSAF source</b-button>
+                      <b-button class="ml-2" variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
+                      <b-button class="ml-2" variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
                     </div>
                   </b-col>
                 </b-row>
@@ -499,11 +502,6 @@ export default {
                   dataOff: '\u2715',
                 },
               };
-            },
-            watch: {
-              enabled() {
-                this.updateCsafSource();
-              },
             },
             methods: {
               deleteCsafSource: function () {
@@ -555,6 +553,7 @@ export default {
           title: 'ID',
           field: 'id',
           class: 'tight',
+          visible: false,
           sortable: true,
         },
         {
@@ -562,6 +561,7 @@ export default {
           field: 'name',
           class: 'tight',
           sortable: true,
+          width: '180px',
           formatter: (value, row) => {
             return row.new === 'New' ? `${value} *` : value;
           },
@@ -571,6 +571,7 @@ export default {
           field: 'url',
           class: 'tight',
           sortable: true,
+          width: '420px',
         },
         {
           title: 'Last fetched',
@@ -589,10 +590,14 @@ export default {
         {
           title: this.$t('admin.enabled'),
           field: 'enabled',
-          class: 'tight',
+          class: 'tight text-center',
+          align: 'center',
+          width: '80px',
           sortable: true,
           formatter(value, row, index) {
-            return value === true ? '<i class="fa fa-check-square-o" />' : '';
+            return value === true
+              ? '<i class="fa fa-check-square-o" aria-label="enabled" />'
+              : '';
           },
         },
       ],
@@ -619,22 +624,20 @@ export default {
             i18n,
             template: `
                 <b-row class="expanded-row">
-                  <b-col sm="6">
-                    <b-validated-input-group-form-input
-                      id="url" :label="$t('admin.url')"
-                      input-group-size="mb-3" rules="required|domainOrUrl"
-                      type="url" v-model="url"
-                      autofocus="true"
-                    />
-                  </b-col>
-                  <b-col sm="6">
-                    <div>
-                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" />{{$t('admin.enabled')}}
+                  <b-col sm="12">
+                    <b-form-group :label="$t('admin.name')">
+                      <b-form-input type="text" v-model="name" required />
+                    </b-form-group>
+                    <b-form-group :label="$t('admin.url')">
+                      <b-form-input type="url" v-model="url" required />
+                    </b-form-group>
+                    <div class="mb-2">
+                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" /> {{$t('admin.enabled')}}
                     </div>
-                    <div style="text-align:right">
+                    <div class="text-right">
                       <b-button variant="outline-danger" @click="deleteCsafSource">Delete CSAF source</b-button>
-                      <b-button variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
-                      <b-button variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
+                      <b-button class="ml-2" variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
+                      <b-button class="ml-2" variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
                     </div>
                   </b-col>
                 </b-row>
@@ -655,11 +658,6 @@ export default {
                   dataOff: '\u2715',
                 },
               };
-            },
-            watch: {
-              enabled() {
-                this.updateCsafSource();
-              },
             },
             methods: {
               deleteCsafSource: function () {
@@ -888,28 +886,24 @@ export default {
     refreshAggregatorsTable: function () {
       this.$refs.table_sources.refresh({
         url: this.apiUrl(),
-        pageNumber: 1,
         silent: true,
       });
     },
     refreshProvidersTable: function () {
       this.$refs.table_providers.refresh({
         url: this.apiProvidersUrl(),
-        pageNumber: 1,
         silent: true,
       });
     },
     refreshCsafSuggestedTable: function () {
       this.$refs.table_suggested.refresh({
         url: this.apiDisUrl(),
-        pageNumber: 1,
         silent: true,
       });
     },
     refreshCsafDocumentsTable: function () {
       this.$refs.table_documents.refresh({
         url: this.apiDocsUrl(),
-        pageNumber: 1,
         silent: true,
       });
     },
