@@ -32,6 +32,7 @@
                     size="md"
                     variant="outline-primary"
                     @click="triggerAll"
+                    :disabled="!vulnsourceEnabled"
                   >
                     <span class="fa fa-refresh"></span>
                     {{ $t('admin.trigger_all') }}
@@ -231,6 +232,9 @@ export default {
       configInitialized: false,
       vulnsourceEnabled: false,
       vulnsourceToggleInitialized: false,
+      // automatic refresh configuration (milliseconds)
+      autoRefreshIntervalMs: 10000,
+      autoRefreshTimer: null,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -308,8 +312,8 @@ export default {
           sortable: true,
         },
         {
-          title: 'Name',
-          field: 'name',
+          title: 'Title',
+          field: 'title',
           sortable: true,
           formatter: (value, row) => {
             return row.seen === false ? `<strong>${value} *</strong>` : value;
@@ -317,12 +321,12 @@ export default {
         },
         {
           title: 'Publisher Namespace',
-          field: 'publisherNamespace',
+          field: 'publisher',
           sortable: true,
         },
         {
           title: 'Version',
-          field: 'trackingVersion',
+          field: 'version',
           class: 'tight',
           sortable: true,
         },
@@ -350,13 +354,14 @@ export default {
           formatter: (value, row) => {
             const allRows = this.$refs.table_documents.getData();
             const sameNameDocs = allRows.filter((doc) => doc.name === row.name);
-            const formatVersion = (version) => Number(version.replace(/\./g, ''));
+            const formatVersion = (version) =>
+              Number(version.replace(/\./g, ''));
             const maxVersion = Math.max(
               ...sameNameDocs.map(
-                (doc) => formatVersion(doc.trackingVersion) || -Infinity,
+                (doc) => formatVersion(doc.version) || -Infinity,
               ),
             );
-            return formatVersion(row.trackingVersion) === maxVersion ? 'Yes' : 'No';
+            return formatVersion(row.version) === maxVersion ? 'Yes' : 'No';
           },
         },
         {
@@ -710,8 +715,8 @@ export default {
       } else {
         this.updateConfigProperties([
           {
-            groupName: 'vuln-source',
-            propertyName: 'csaf.enabled',
+            groupName: 'vuln.datasource',
+            propertyName: 'extension.csaf.enabled',
             propertyValue: this.vulnsourceEnabled,
           },
         ]);
@@ -731,14 +736,14 @@ export default {
       var addRow = this.$refs.table_suggested
         .getData()
         .find((item) => item.id.toString() === id.toString());
-      addRow.discovery = false;
+      addRow.discovered = false;
       this.updateCsafSource(addRow);
     },
     addSelected() {
       const selectedRows = this.$refs.table_suggested.getSelections();
       if (selectedRows.length > 0) {
         selectedRows.forEach((item) => {
-          item.discovery = false;
+          item.discovered = false;
           this.updateCsafSource(item);
         });
       }
@@ -750,7 +755,7 @@ export default {
           id: prow.id,
           url: prow.url,
           name: prow.name,
-          discovery: prow.discovery,
+          discovered: prow.discovered,
           enabled: prow.enabled,
           fetchInterval: prow.fetchInterval,
           aggregator: prow.aggregator,
@@ -911,11 +916,39 @@ export default {
     saveConfiguration: function () {
       this.updateConfigProperties([
         {
-          groupName: 'vuln-source',
-          propertyName: 'csaf.enabled',
+          groupName: 'vuln.datasource',
+          propertyName: 'extension.csaf.enabled',
           propertyValue: this.vulnsourceEnabled,
         },
       ]);
+    },
+    startAutoRefresh() {
+      // Prevent duplicate timers
+      if (this.autoRefreshTimer) return;
+      // Immediately refresh once, then schedule periodic refreshes
+      if (this.vulnsourceEnabled) {
+        this.refreshCsafSuggestedTable();
+        this.refreshProvidersTable();
+        this.refreshAggregatorsTable();
+      }
+      this.autoRefreshTimer = setInterval(() => {
+        if (!this.vulnsourceEnabled) return;
+        try {
+          this.refreshCsafSuggestedTable();
+          this.refreshProvidersTable();
+          this.refreshAggregatorsTable();
+        } catch (e) {
+          // keep polling even if one refresh fails
+          // eslint-disable-next-line no-console
+          console.warn('CSAF auto-refresh error', e);
+        }
+      }, this.autoRefreshIntervalMs);
+    },
+    stopAutoRefresh() {
+      if (this.autoRefreshTimer) {
+        clearInterval(this.autoRefreshTimer);
+        this.autoRefreshTimer = null;
+      }
     },
     updateSourcesTable: function () {
       this.axios.get(this.apiUrl()).then((response) => {
@@ -941,12 +974,12 @@ export default {
   mounted() {
     this.axios.get(this.configUrl).then((response) => {
       let configItems = response.data.filter(function (item) {
-        return item.groupName === 'vuln-source';
+        return item.groupName === 'vuln.datasource';
       });
       for (let i = 0; i < configItems.length; i++) {
         let item = configItems[i];
         switch (item.propertyName) {
-          case 'csaf.enabled':
+          case 'extension.csaf.enabled':
             if (item.propertyValue === 'true') {
               this.vulnsourceEnabled = true;
             } else {
@@ -959,6 +992,8 @@ export default {
       this.refreshCsafDocumentsTable();
       this.refreshCsafSuggestedTable();
       this.configInitialized = true;
+      // start automatic refresh on component load
+      this.startAutoRefresh();
     });
     EventBus.$on('admin:csafAggregators:rowDeleted', (index, row) => {
       this.refreshAggregatorsTable();
@@ -1002,6 +1037,8 @@ export default {
     });
   },
   beforeDestroy() {
+    // stop periodic refresh when component is destroyed
+    this.stopAutoRefresh();
     EventBus.$off('admin:csafAggregators:rowUpdated');
     EventBus.$off('admin:csafAggregators:rowDeleted');
     EventBus.$off('admin:csafProviders:rowUpdated');
