@@ -45,6 +45,7 @@ const acceptableRootContextPaths = [
   '/components',
   '/services',
   '/vulnerabilities',
+  '/advisories',
   '/licenses',
   '/policy',
   '/admin',

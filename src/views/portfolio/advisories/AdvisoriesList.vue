@@ -31,7 +31,7 @@ export default {
   watch: {},
   methods: {
     handleRowClick(row) {
-      this.$router.push({ name: '/advisory', params: { id: row.name } });
+      this.$router.push({ name: 'Advisory', params: { advisoryId: row.id } });
     },
     apiUrl: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}`;
@@ -54,10 +54,15 @@ export default {
           sortable: true,
           formatter(value, row, index) {
             let url = xssFilters.uriInUnQuotedAttr(
-              '../advisories/' + encodeURIComponent(row.documentId),
+              '../advisories/' + encodeURIComponent(row.id),
             );
             return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
           },
+        },
+        {
+          title: this.$t('message.title'),
+          field: 'title',
+          sortable: true,
         },
         {
           title: this.$t('admin.url'),

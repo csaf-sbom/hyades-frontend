@@ -21,14 +21,6 @@
                   <b-button
                     size="md"
                     variant="outline-primary"
-                    v-b-modal.vulnSourceCSAFUpload
-                  >
-                    <span class="fa fa-upload"></span>
-                    {{ $t('admin.upload_file') }}
-                  </b-button>
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
                     @click="triggerAll"
                     :disabled="!vulnsourceEnabled"
                   >
@@ -132,6 +124,14 @@
               <b-card-body>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
                   <!--<h2>{{ $t('admin.csaf_documents') }}:</h2>-->
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    v-b-modal.vulnSourceCSAFUpload
+                  >
+                    <span class="fa fa-upload"></span>
+                    {{ $t('admin.upload_file') }}
+                  </b-button>
                   <b-button
                     size="md"
                     variant="outline-primary"
@@ -738,7 +738,11 @@ export default {
         .getData()
         .find((item) => item.id.toString() === docId.toString());
       this.detailTitle = srow.name;
-      this.detailContent = await this.getDocument(docId);
+      const docData = await this.getDocument(docId);
+      // Parse the content property which contains the CSAF JSON as a string
+      this.detailContent = docData && docData.entity && docData.entity.content 
+        ? JSON.parse(docData.entity.content) 
+        : null;
       this.$bvModal.show('vulnSourceCSAFViewDocModal');
     },
     handleAdd(id) {
@@ -785,15 +789,27 @@ export default {
     },
     async openCompare() {
       const selectedRows = this.$refs.table_documents.getSelections();
-      this.compareLeftTitle = selectedRows[0].name;
-      this.compareLeftContent = await this.getDocument(selectedRows[0].id);
-      this.compareRightTitle = selectedRows[1].name;
-      this.compareRightContent = await this.getDocument(selectedRows[1].id);
-      if (selectedRows.length === 2) {
-        this.$bvModal.show('vulnSourceCSAFCompareModal');
-      } else {
+      if (selectedRows.length !== 2) {
         alert(this.$t('admin.please_select_two_rows'));
+        return;
       }
+      
+      const leftDoc = await this.getDocument(selectedRows[0].id);
+      const rightDoc = await this.getDocument(selectedRows[1].id);
+      
+      this.compareLeftTitle = selectedRows[0].name;
+      // Parse the content property which contains the CSAF JSON as a string
+      this.compareLeftContent = leftDoc && leftDoc.entity && leftDoc.entity.content 
+        ? JSON.parse(leftDoc.entity.content) 
+        : null;
+      
+      this.compareRightTitle = selectedRows[1].name;
+      // Parse the content property which contains the CSAF JSON as a string
+      this.compareRightContent = rightDoc && rightDoc.entity && rightDoc.entity.content 
+        ? JSON.parse(rightDoc.entity.content) 
+        : null;
+      
+      this.$bvModal.show('vulnSourceCSAFCompareModal');
     },
     deleteSelected() {
       const selectedRows = this.$refs.table_documents.getSelections();
@@ -805,7 +821,7 @@ export default {
         var rowIndex = this.$refs.table_documents
           .getData()
           .findIndex((item) => item.id === row.id);
-        const url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DOCUMENT}/${row.id}`;
+        const url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/${row.id}`;
         return this.axios
           .delete(url)
           .then((response) => {
@@ -838,7 +854,7 @@ export default {
             .getData()
             .findIndex((item) => item.id === row.id);
 
-          let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DOCUMENT}/seen/${row.id}`;
+          let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/seen/${row.id}`;
           this.axios
             .post(url, { id: row.id })
             .then((response) => {
@@ -867,7 +883,7 @@ export default {
         });
     },
     getDocument(docId) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DOCUMENT}/${docId}`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/${docId}`;
       return this.axios
         .get(url)
         .then((response) => {
@@ -885,7 +901,7 @@ export default {
       return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
     },
     apiDocsUrl: function () {
-      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DOCUMENT}`;
+      return `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}?format=CSAF`;
     },
     apiDisUrl: function () {
       return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DISCOVERY}`;
@@ -1025,6 +1041,9 @@ export default {
     });
     EventBus.$on('refreshAggregatorsTable', () => {
       this.refreshAggregatorsTable();
+    });
+    EventBus.$on('refreshDocumentsTable', () => {
+      this.refreshCsafDocumentsTable();
     });
     this.$refs.table_documents.$el.addEventListener('click', (event) => {
       const target = event.target;

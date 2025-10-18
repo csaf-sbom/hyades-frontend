@@ -135,15 +135,21 @@
 
 <script>
 import xssFilters from 'xss-filters';
+import common from '../../../shared/common';
 import EventBus from '../../../shared/eventbus';
 
 export default {
+  props: {
+    advisoryId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       showJson: false,
       nProjects: 0,
       nComponents: 0,
-      advisoryId: null,
       advisory: {},
       doc: {},
       projectsColumns: [
@@ -174,28 +180,37 @@ export default {
       ],
       vulnerabilitiesColumns: [
         {
-          title: this.$t('admin.id'),
+          title: this.$t('message.name'),
           field: 'vulnId',
           sortable: true,
           formatter(value, row, index) {
             let url = xssFilters.uriInUnQuotedAttr(
-              '../vulnerabilities/' + row.source + '/' + row.vulnId,
+              '../vulnerabilities/' +
+                row.source +
+                '/' +
+                encodeURIComponent(value),
             );
-            return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
+            return (
+              common.formatSourceLabel(row.source) +
+              ` <a href="${url}">${xssFilters.inHTMLData(value)}</a>`
+            );
           },
         },
         {
-          title: this.$t('admin.version'),
-          field: 'version',
-          class: 'tight',
+          title: this.$t('message.title'),
+          field: 'title',
           sortable: true,
-          width: '350px',
         },
         {
-          title: this.$t('admin.description'),
-          field: 'desc',
+          title: this.$t('message.severity'),
+          field: 'severity',
+          class: 'tight',
           align: 'center',
           sortable: true,
+          width: '150px',
+          formatter(value, row, index) {
+            return common.formatSeverityLabel(value);
+          },
         },
       ],
       affectedProjects: [],
@@ -279,11 +294,10 @@ export default {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/${this.advisoryId}`;
       return url;
     },
-    initializeData: function () {
-      this.advisoryId = this.$route.params.advisoryId;
-      //this.vulnId = decodeURIComponent(this.$route.params.advisoryId);
-    },
     loadData: function () {
+      if (!this.advisoryId) {
+        return;
+      }
       this.axios.get(this.apiUrl()).then((response) => {
         this.advisory = response.data.entity;
         this.nProjects = response.data.affectedProjects.length;
@@ -313,18 +327,13 @@ export default {
     },
   },
   watch: {
-    '$route.params.advisoryId'(newValue) {
+    advisoryId(newValue) {
       EventBus.$emit('crumble');
-      this.initializeData();
       this.loadData();
     },
     $route() {
       //this.getTabFromRoute().activate();
     },
-  },
-  beforeMount() {
-    this.advisoryId = this.$route.params.advisoryId;
-    this.initializeData();
   },
   mounted() {
     this.loadData();
