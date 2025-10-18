@@ -314,7 +314,10 @@ export default {
           field: 'title',
           sortable: true,
           formatter: (value, row) => {
-            return row.seen === false ? `<strong>${value} *</strong>` : value;
+            const title =
+              row.seen === false ? `<strong>${value} *</strong>` : value;
+            // Render a normal anchor with a data attribute; clicks are intercepted and routed client-side
+            return `<a href="/advisories/${row.id}" class="csaf-doc-link" data-doc-id="${row.id}">${title}</a>`;
           },
         },
         {
@@ -378,6 +381,10 @@ export default {
         pagination: true,
         sidePagination: 'server',
         dataField: 'objects',
+        responseHandler: function (res, xhr) {
+          res.total = xhr.getResponseHeader('X-Total-Count');
+          return res;
+        },
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
@@ -1021,9 +1028,21 @@ export default {
     });
     this.$refs.table_documents.$el.addEventListener('click', (event) => {
       const target = event.target;
+      // handle existing View Details button clicks
       if (target.matches('[id^="doc-"]')) {
         const docId = target.id.split('-')[1];
         this.showDoc(docId);
+        return;
+      }
+      // handle clicks on title links rendered in the title formatter
+      const link = target.closest && target.closest('a.csaf-doc-link');
+      if (link) {
+        event.preventDefault();
+        const docId = link.getAttribute('data-doc-id');
+        if (docId) {
+          // navigate using vue-router to keep SPA navigation
+          this.$router.push({ path: `/advisories/${docId}` });
+        }
       }
     });
     this.$refs.table_suggested.$el.addEventListener('click', (event) => {

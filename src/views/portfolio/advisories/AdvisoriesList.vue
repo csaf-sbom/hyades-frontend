@@ -83,7 +83,12 @@ export default {
         showColumns: true,
         showRefresh: true,
         pagination: true,
-        sidePagination: 'client',
+        sidePagination: 'server',
+        dataField: 'objects',
+        responseHandler: function (res, xhr) {
+          res.total = xhr.getResponseHeader('X-Total-Count');
+          return res;
+        },
         queryParamsType: 'pageSize',
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,

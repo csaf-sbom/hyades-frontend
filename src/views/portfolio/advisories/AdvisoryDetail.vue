@@ -81,7 +81,20 @@
             </tr>
           </table>
         </b-card>
-        <pre>{{ JSON.stringify(doc, null, 2) }}</pre>
+        <div class="mt-2 d-flex justify-content-end">
+          <b-button
+            size="sm"
+            variant="outline-secondary"
+            @click="showJson = !showJson"
+          >
+            {{ showJson ? $t('admin.hide_json') : $t('admin.show_json') }}
+          </b-button>
+        </div>
+        <b-collapse v-model="showJson">
+          <b-card class="mt-2">
+            <pre class="mb-0">{{ JSON.stringify(doc, null, 2) }}</pre>
+          </b-card>
+        </b-collapse>
       </b-tab>
       <b-tab :title="$t('admin.affected_projects')">
         <bootstrap-table
@@ -106,7 +119,7 @@
           :data="historyData"
           :options="historyOptions"
         />
-      <!--  <b-card
+        <!--  <b-card
           :title="value.date"
           v-for="(value, key) in doc.document.tracking.revision_history"
           :key="key"
@@ -127,6 +140,7 @@ import EventBus from '../../../shared/eventbus';
 export default {
   data() {
     return {
+      showJson: false,
       nProjects: 0,
       nComponents: 0,
       advisoryId: null,
