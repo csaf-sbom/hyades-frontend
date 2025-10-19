@@ -1,10 +1,10 @@
 <template>
   <div class="animated fadeIn">
     <!-- Header Card with Title -->
-    <b-card :no-body="true" class="mb-3 shadow-sm">
+    <b-card :no-body="true" class="mb-3">
       <b-card-body class="p-4">
         <div class="d-flex align-items-start">
-          <div class="advisory-icon mr-3">
+          <div class="mr-3">
             <i class="fa fa-shield fa-2x text-primary"></i>
           </div>
           <div class="flex-grow-1">
@@ -25,8 +25,8 @@
     <b-tabs class="body-bg-color">
       <b-tab :title="$t('admin.overview')">
         <!-- Advisory Information Card -->
-        <b-card class="mb-3 shadow-sm">
-          <h6 class="card-subtitle mb-3 text-muted">
+        <b-card class="mb-3">
+          <h6 class="text-muted font-weight-bold mb-3">
             <i class="fa fa-info-circle"></i> {{ $t('message.advisory') }} {{ $t('message.details') }}
           </h6>
           <b-row>
@@ -66,8 +66,8 @@
         </b-card>
 
         <!-- Publisher Information Card -->
-        <b-card class="mb-3 shadow-sm">
-          <h6 class="card-subtitle mb-3 text-muted">
+        <b-card class="mb-3">
+          <h6 class="text-muted font-weight-bold mb-3">
             <i class="fa fa-building"></i> {{ $t('admin.publisher') }}
           </h6>
           <b-row>
@@ -97,36 +97,36 @@
         <b-card
           v-for="(value, key) in doc.document.notes"
           :key="key"
-          class="mb-3 shadow-sm"
+          class="mb-3"
         >
-          <h6 class="card-subtitle mb-2">
+          <h6 class="font-weight-bold mb-2">
             <i class="fa fa-file-text-o"></i> {{ value.category }}
           </h6>
-          <p class="card-text mb-0" style="white-space: pre-wrap;">{{ value.text }}</p>
+          <p class="mb-0" style="white-space: pre-wrap;">{{ value.text }}</p>
         </b-card>
 
         <!-- Statistics Card -->
-        <b-card class="mb-3 shadow-sm">
-          <h6 class="card-subtitle mb-3 text-muted">
+        <b-card class="mb-3">
+          <h6 class="text-muted font-weight-bold mb-3">
             <i class="fa fa-bar-chart"></i> {{ $t('admin.statistics') }}
           </h6>
           <b-row>
             <b-col md="6">
-              <div class="stat-box text-center p-3 mb-3 mb-md-0">
-                <div class="stat-icon text-primary mb-2">
+              <div class="text-center p-3 mb-3 mb-md-0 border rounded bg-secondary text-white">
+                <div class="mb-2" style="opacity: 0.9;">
                   <i class="fa fa-cube fa-3x"></i>
                 </div>
-                <div class="stat-value h2 mb-1">{{ nProjects }}</div>
-                <div class="stat-label text-muted">{{ $t('admin.affected_projects') }}</div>
+                <div class="h2 mb-1 font-weight-bold">{{ nProjects }}</div>
+                <div class="text-uppercase small" style="opacity: 0.8;">{{ $t('admin.affected_projects') }}</div>
               </div>
             </b-col>
             <b-col md="6">
-              <div class="stat-box text-center p-3">
-                <div class="stat-icon text-success mb-2">
+              <div class="text-center p-3 border rounded bg-dark text-white">
+                <div class="mb-2" style="opacity: 0.9;">
                   <i class="fa fa-cubes fa-3x"></i>
                 </div>
-                <div class="stat-value h2 mb-1">{{ nComponents }}</div>
-                <div class="stat-label text-muted">{{ $t('admin.affected_components') }}</div>
+                <div class="h2 mb-1 font-weight-bold">{{ nComponents }}</div>
+                <div class="text-uppercase small" style="opacity: 0.8;">{{ $t('admin.affected_components') }}</div>
               </div>
             </b-col>
           </b-row>
@@ -143,14 +143,20 @@
           </b-button>
         </div>
         <b-collapse v-model="showJson">
-          <b-card class="mt-3 shadow-sm">
+          <b-card class="mt-3 bg-dark">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <h6 class="mb-0"><i class="fa fa-code"></i> Raw JSON Document</h6>
-              <b-button size="sm" variant="outline-primary" @click="copyJson">
+              <h6 class="mb-0 text-white"><i class="fa fa-code"></i> Raw JSON Document</h6>
+              <b-button size="sm" variant="outline-light" @click="copyJson">
                 <i class="fa fa-clipboard"></i> Copy
               </b-button>
             </div>
-            <pre class="json-viewer mb-0">{{ JSON.stringify(doc, null, 2) }}</pre>
+            <vue-json-pretty
+              :data="doc"
+              :deep="3"
+              :show-double-quotes="true"
+              :show-length="true"
+              class="json-viewer"
+            />
           </b-card>
         </b-collapse>
       </b-tab>
@@ -162,11 +168,6 @@
           :options="options"
         />
       </b-tab>
-      <b-tab :title="$t('admin.product_tree')">
-        <b-card>
-          <csaf-product-tree v-if="doc" :content="doc" />
-        </b-card>
-      </b-tab>
       <b-tab :title="$t('admin.vulnerabilities')">
         <bootstrap-table
           ref="table_vulnerabilities"
@@ -175,22 +176,24 @@
           :options="options"
         />
       </b-tab>
-      <b-tab :title="$t('admin.document_history')">
+      <b-tab v-if="isCsafDocument">
+        <template #title>
+          {{ $t('admin.document_history') }} <b-badge variant="info" class="ml-1">CSAF</b-badge>
+        </template>
         <bootstrap-table
           ref="table_history"
           :columns="historyColumns"
           :data="historyData"
           :options="historyOptions"
         />
-        <!--  <b-card
-          :title="value.date"
-          v-for="(value, key) in doc.document.tracking.revision_history"
-          :key="key"
-        >
-          <b-card-text>
-            {{ value.summary }}
-          </b-card-text>
-        </b-card> -->
+      </b-tab>
+      <b-tab v-if="isCsafDocument">
+        <template #title>
+          {{ $t('admin.product_tree') }} <b-badge variant="info" class="ml-1">CSAF</b-badge>
+        </template>
+        <b-card>
+          <csaf-product-tree v-if="doc" :content="doc" />
+        </b-card>
       </b-tab>
     </b-tabs>
   </div>
@@ -201,6 +204,8 @@ import xssFilters from 'xss-filters';
 import common from '../../../shared/common';
 import EventBus from '../../../shared/eventbus';
 import CsafProductTree from '../../administration/vuln-sources/CsafProductTree.vue';
+import VueJsonPretty from 'vue-json-pretty';
+import 'vue-json-pretty/lib/styles.css';
 
 export default {
   props: {
@@ -351,6 +356,15 @@ export default {
   },
   components: {
     CsafProductTree,
+    VueJsonPretty,
+  },
+  computed: {
+    isCsafDocument() {
+      // Check if this is a CSAF document by verifying CSAF-specific structure
+      return this.doc && 
+             this.doc.document && 
+             (this.doc.document.tracking || this.doc.document.publisher);
+    },
   },
   methods: {
     formatDate(value) {
@@ -424,4 +438,42 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Minimal custom styling - rely on Bootstrap classes */
+.json-viewer {
+  max-height: 600px;
+  overflow: auto;
+  background: #1e1e1e !important;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+/* Dark theme for vue-json-pretty */
+.json-viewer >>> .vjs-tree {
+  color: #d4d4d4;
+}
+
+.json-viewer >>> .vjs-key {
+  color: #9cdcfe;
+}
+
+.json-viewer >>> .vjs-value__string {
+  color: #ce9178;
+}
+
+.json-viewer >>> .vjs-value__number {
+  color: #b5cea8;
+}
+
+.json-viewer >>> .vjs-value__boolean {
+  color: #569cd6;
+}
+
+.json-viewer >>> .vjs-value__null {
+  color: #569cd6;
+}
+
+.json-viewer >>> .vjs-tree-brackets {
+  color: #d4d4d4;
+}
+</style>
