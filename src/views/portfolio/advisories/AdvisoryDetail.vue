@@ -192,7 +192,11 @@
           {{ $t('admin.product_tree') }} <b-badge variant="info" class="ml-1">CSAF</b-badge>
         </template>
         <b-card>
-          <csaf-product-tree v-if="doc" :content="doc" />
+          <csaf-product-tree 
+            v-if="doc" 
+            :content="doc" 
+            :product-vulnerability-status="productVulnerabilityStatus"
+          />
         </b-card>
       </b-tab>
     </b-tabs>
@@ -364,6 +368,39 @@ export default {
       return this.doc && 
              this.doc.document && 
              (this.doc.document.tracking || this.doc.document.publisher);
+    },
+    productVulnerabilityStatus() {
+      // Build a map of product_id -> vulnerability statuses
+      if (!this.doc || !this.doc.vulnerabilities) return {};
+      
+      const statusMap = {};
+      
+      this.doc.vulnerabilities.forEach(vuln => {
+        if (!vuln.product_status) return;
+        
+        // Process each status category
+        Object.keys(vuln.product_status).forEach(statusKey => {
+          const productIds = vuln.product_status[statusKey];
+          if (!Array.isArray(productIds)) return;
+          
+          productIds.forEach(productId => {
+            if (!statusMap[productId]) {
+              statusMap[productId] = {
+                statuses: new Set(),
+                vulnerabilities: []
+              };
+            }
+            statusMap[productId].statuses.add(statusKey);
+            statusMap[productId].vulnerabilities.push({
+              id: vuln.cve || vuln.title || 'Unknown',
+              status: statusKey,
+              title: vuln.title
+            });
+          });
+        });
+      });
+      
+      return statusMap;
     },
   },
   methods: {

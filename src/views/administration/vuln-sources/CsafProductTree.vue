@@ -20,6 +20,25 @@
         </b-button>
       </div>
     </div>
+    
+    <!-- Vulnerability Status Legend -->
+    <div v-if="hasProductTree && hasVulnerabilityData" class="bg-secondary text-white mb-3 p-3 rounded">
+      <small>
+        <strong><i class="fa fa-info-circle"></i> Vulnerability Status:</strong>
+        <b-badge variant="danger" class="ml-2">
+          <i class="fa fa-exclamation-circle"></i> Known Affected
+        </b-badge>
+        <b-badge variant="warning" class="ml-2">
+          <i class="fa fa-search"></i> Under Investigation
+        </b-badge>
+        <b-badge variant="success" class="ml-2">
+          <i class="fa fa-check"></i> Fixed
+        </b-badge>
+        <b-badge variant="success" class="ml-2">
+          <i class="fa fa-check-circle"></i> Not Affected
+        </b-badge>
+      </small>
+    </div>
     <div v-if="!hasProductTree" class="text-muted">
       <i class="fa fa-info-circle"></i> No product_tree found in this CSAF document.
     </div>
@@ -30,6 +49,7 @@
         :node="node"
         :level="0"
         :expanded-nodes="expandedNodes"
+        :product-vulnerability-status="productVulnerabilityStatus"
         @toggle="toggleNode"
       />
     </div>
@@ -46,6 +66,10 @@ export default {
     content: {
       type: Object,
       required: true,
+    },
+    productVulnerabilityStatus: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -66,6 +90,9 @@ export default {
       if (Array.isArray(pt)) return pt;
       if (pt.branches && Array.isArray(pt.branches)) return pt.branches;
       return [pt];
+    },
+    hasVulnerabilityData() {
+      return this.productVulnerabilityStatus && Object.keys(this.productVulnerabilityStatus).length > 0;
     },
   },
   methods: {
@@ -120,6 +147,10 @@ export default {
           type: Number,
           default: 0,
         },
+        productVulnerabilityStatus: {
+          type: Object,
+          default: () => ({}),
+        },
       },
       computed: {
         nodeId() {
@@ -131,23 +162,7 @@ export default {
         hasChildren() {
           return this.node.branches && Array.isArray(this.node.branches) && this.node.branches.length > 0;
         },
-        categoryVariant() {
-          const category = (this.node.category || '').toLowerCase();
-          const variants = {
-            'vendor': 'primary',
-            'product_family': 'info',
-            'product_name': 'success',
-            'product_version': 'warning',
-            'architecture': 'secondary',
-            'host_name': 'dark',
-            'language': 'light',
-            'legacy': 'danger',
-            'patch_level': 'info',
-            'service_pack': 'warning',
-            'specification': 'secondary',
-          };
-          return variants[category] || 'secondary';
-        },
+
         categoryIcon() {
           const category = (this.node.category || '').toLowerCase();
           const icons = {
@@ -164,6 +179,57 @@ export default {
             'specification': 'fa-file-text',
           };
           return icons[category] || 'fa-folder';
+        },
+        productId() {
+          return this.node.product?.product_id || null;
+        },
+        vulnerabilityInfo() {
+          if (!this.productId || !this.productVulnerabilityStatus[this.productId]) {
+            return null;
+          }
+          return this.productVulnerabilityStatus[this.productId];
+        },
+        vulnerabilityStatusBadges() {
+          if (!this.vulnerabilityInfo) return [];
+          
+          const badges = [];
+          const statuses = this.vulnerabilityInfo.statuses;
+          
+          // Priority order: show most critical status first
+          if (statuses.has('known_affected')) {
+            badges.push({ 
+              variant: 'danger', 
+              icon: 'fa-exclamation-circle', 
+              text: 'Known Affected',
+              count: this.vulnerabilityInfo.vulnerabilities.filter(v => v.status === 'known_affected').length
+            });
+          }
+          if (statuses.has('under_investigation')) {
+            badges.push({ 
+              variant: 'warning', 
+              icon: 'fa-search', 
+              text: 'Under Investigation',
+              count: this.vulnerabilityInfo.vulnerabilities.filter(v => v.status === 'under_investigation').length
+            });
+          }
+          if (statuses.has('fixed')) {
+            badges.push({ 
+              variant: 'success', 
+              icon: 'fa-check', 
+              text: 'Fixed',
+              count: this.vulnerabilityInfo.vulnerabilities.filter(v => v.status === 'fixed').length
+            });
+          }
+          if (statuses.has('known_not_affected')) {
+            badges.push({ 
+              variant: 'success', 
+              icon: 'fa-check-circle', 
+              text: 'Not Affected',
+              count: this.vulnerabilityInfo.vulnerabilities.filter(v => v.status === 'known_not_affected').length
+            });
+          }
+          
+          return badges;
         },
       },
       methods: {
@@ -187,56 +253,82 @@ export default {
         handleChildToggle(childNodeId) {
           this.$emit('toggle', childNodeId);
         },
+        getVulnerabilityTooltip(badge) {
+          if (!this.vulnerabilityInfo) return '';
+          
+          const vulns = this.vulnerabilityInfo.vulnerabilities.filter(v => {
+            const statusKey = v.status.toLowerCase().replace(/_/g, '_');
+            const badgeText = badge.text.toLowerCase().replace(/ /g, '_');
+            return statusKey === badgeText || v.status === badgeText;
+          });
+          
+          let tooltip = `<strong>${badge.text}</strong><br/>`;
+          tooltip += `<small>${badge.count} vulnerability(ies):</small><br/>`;
+          vulns.forEach(v => {
+            tooltip += `• ${v.id}${v.title ? ': ' + v.title : ''}<br/>`;
+          });
+          
+          return tooltip;
+        },
       },
       template: `
-        <div class="product-node" :class="'level-' + level" :style="{ marginLeft: (level * 1.5) + 'rem' }">
-          <div class="node-content" @click="toggle">
-            
-                        
-            <div class="node-info">
-              <div class="node-header">
+        <div :style="{ marginLeft: (level * 1.5) + 'rem' }" class="my-2">
+          <div class="p-3 bg-dark text-white border rounded cursor-pointer" @click="toggle">
+            <div class="d-flex align-items-center flex-wrap">
                 <span class="node-expand-icon" v-if="hasChildren">
                     <i :class="isExpanded ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"></i>
                 </span>
                 <span class="node-expand-icon placeholder" v-else></span>
-                <i class="fa" :class="categoryIcon"></i>
+                <i class="fa text-light mr-2" :class="categoryIcon"></i>
                 <b-badge 
-                  :variant="categoryVariant" 
-                  class="category-badge"
+                  variant="light" 
+                  class="mr-2"
                   v-if="node.category"
                 >
                   {{ fmt(node.category) }}
                 </b-badge>
-                <span class="node-name" v-if="node.name">{{ fmt(node.name) }}</span>
-              </div>
-              
-              <div class="node-metadata" v-if="node.product">
-                <small class="text-muted">
-                  <i class="fa fa-info-circle"></i>
-                  <span v-if="node.product.product_id">
-                    ID: <code>{{ node.product.product_id }}</code>
-                  </span>
-                  <span v-if="node.product.name && node.product.name !== node.name">
-                    | {{ node.product.name }}
-                  </span>
-                </small>
-              </div>
+                <strong class="text-white" v-if="node.name">{{ fmt(node.name) }}</strong>
+                
+                <!-- Vulnerability Status Badges -->
+                <span v-if="vulnerabilityStatusBadges.length > 0" class="vulnerability-badges ml-2">
+                  <b-badge 
+                    v-for="(badge, idx) in vulnerabilityStatusBadges" 
+                    :key="idx"
+                    :variant="badge.variant"
+                    class="ml-1"
+                    v-b-tooltip.hover.html 
+                    :title="getVulnerabilityTooltip(badge)"
+                  >
+                    <i class="fa" :class="badge.icon"></i> {{ badge.count }}
+                  </b-badge>
+                </span>
+            </div>
+            
+            <div v-if="node.product" class="mt-2">
+              <small class="text-light">
+                <i class="fa fa-info-circle"></i>
+                <span v-if="node.product.product_id">
+                  ID: <code class="bg-secondary text-white px-2 py-1 rounded">{{ node.product.product_id }}</code>
+                </span>
+                <span v-if="node.product.name && node.product.name !== node.name">
+                  | {{ node.product.name }}
+                </span>
+              </small>
             </div>
           </div>
           
-          <transition name="slide-fade">
-            <div v-if="hasChildren && isExpanded" class="node-children">
-              <product-node 
-                v-for="(child, i) in node.branches" 
-                :key="i"
-                :index="i"
-                :node="child"
-                :level="level + 1"
-                :expanded-nodes="expandedNodes"
-                @toggle="handleChildToggle"
-              />
-            </div>
-          </transition>
+          <div v-if="hasChildren && isExpanded" class="mt-2">
+            <product-node 
+              v-for="(child, i) in node.branches" 
+              :key="i"
+              :index="i"
+              :node="child"
+              :level="level + 1"
+              :expanded-nodes="expandedNodes"
+              :product-vulnerability-status="productVulnerabilityStatus"
+              @toggle="handleChildToggle"
+            />
+          </div>
         </div>
       `,
     },
@@ -245,215 +337,35 @@ export default {
 </script>
 
 <style scoped>
-.csaf-product-tree {
-  margin-top: 1rem;
-}
-
-.tree-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.product-tree-container {
-  background: transparent;
-  border-radius: 8px;
-  padding: 0;
-  border: none;
-}
-
-.product-node {
-  margin: 0.75rem 0;
-  position: relative;
-}
-
-.node-content {
-  display: flex;
-  align-items: center;
-  padding: 0.85rem 1rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.node-content:hover {
-  background: rgba(0, 123, 255, 0.05);
-  border-color: rgba(0, 123, 255, 0.3);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-  transform: translateX(2px);
-}
-
+/* Minimal custom CSS - rely on Bootstrap */
 .node-expand-icon {
   width: 20px;
   min-width: 20px;
-  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-right: 0.5rem;
-  color: #6c757d;
-  font-size: 0.85rem;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.node-expand-icon:hover {
-  color: #007bff;
 }
 
 .node-expand-icon.placeholder {
   opacity: 0;
-  pointer-events: none;
 }
 
-.node-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-self: center;
+.cursor-pointer {
+  cursor: pointer;
 }
 
-.node-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+/* Subtle pulse animation for critical vulnerabilities */
+.badge-danger {
+  animation: pulse-danger 2s infinite;
 }
 
-.node-header > .fa {
-  color: #6c757d;
-  font-size: 1rem;
-}
-
-.category-badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.25rem 0.5rem;
-}
-
-.node-name {
-  font-weight: 500;
-  color: #212529;
-  font-size: 0.95rem;
-}
-
-.node-metadata {
-  margin-top: 0.5rem;
-  padding-left: 0;
-}
-
-.node-metadata code {
-  background: #e9ecef;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  font-size: 0.85rem;
-  color: #495057;
-}
-
-.node-children {
-  margin-top: 0.75rem;
-  margin-left: 0;
-  padding-left: 0;
-  border-left: 2px solid rgba(0, 123, 255, 0.2);
-  position: relative;
-}
-
-/* Level-based styling for depth indication */
-.product-node.level-0 .node-content {
-  border-left: 4px solid #007bff;
-}
-
-.product-node.level-1 .node-content {
-  border-left: 4px solid #17a2b8;
-}
-
-.product-node.level-2 .node-content {
-  border-left: 4px solid #28a745;
-}
-
-.product-node.level-3 .node-content {
-  border-left: 4px solid #ffc107;
-}
-
-.product-node.level-4 .node-content {
-  border-left: 4px solid #fd7e14;
-}
-
-.product-node.level-5 .node-content,
-.product-node.level-6 .node-content,
-.product-node.level-7 .node-content {
-  border-left: 4px solid #6c757d;
-}
-
-/* Smooth transitions */
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.2s ease-in;
-}
-
-.slide-fade-enter {
-  transform: translateY(-10px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateY(-5px);
-  opacity: 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .tree-controls {
-    flex-direction: column;
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
   }
-  
-  .tree-controls button {
-    width: 100%;
-  }
-  
-  .node-children {
-    margin-left: 1rem;
-    padding-left: 0.5rem;
-  }
-  
-  .node-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* Dark mode support (optional - if your app supports it) */
-@media (prefers-color-scheme: dark) {
-  .node-content {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-  }
-  
-  .node-content:hover {
-    background: rgba(0, 123, 255, 0.1);
-    border-color: rgba(0, 123, 255, 0.3);
-  }
-  
-  .node-name {
-    color: #e2e8f0;
-  }
-  
-  .node-metadata code {
-    background: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-  }
-  
-  .node-children {
-    border-left-color: rgba(0, 123, 255, 0.3);
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0);
   }
 }
 </style>
