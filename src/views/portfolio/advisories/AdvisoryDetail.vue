@@ -1,98 +1,156 @@
 <template>
   <div class="animated fadeIn">
-    <b-card :no-body="true">
-      <b-card-body class="p-3 clearfix">
-        <div class="h5 mb-0 mt-2">{{ advisory.name }}</div>
+    <!-- Header Card with Title -->
+    <b-card :no-body="true" class="mb-3 shadow-sm">
+      <b-card-body class="p-4">
+        <div class="d-flex align-items-start">
+          <div class="advisory-icon mr-3">
+            <i class="fa fa-shield fa-2x text-primary"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h4 class="mb-2">{{ advisory.title }}</h4>
+            <div class="text-muted">
+              <b-badge variant="secondary" class="mr-2">
+                <i class="fa fa-tag"></i> {{ advisory.name }}
+              </b-badge>
+              <b-badge variant="info">
+                <i class="fa fa-code-branch"></i> v{{ advisory.version }}
+              </b-badge>
+            </div>
+          </div>
+        </div>
       </b-card-body>
     </b-card>
 
     <b-tabs class="body-bg-color">
       <b-tab :title="$t('admin.overview')">
-        <b-card>
-          <table>
-            <tr>
-              <th>{{ $t('admin.name') }}</th>
-              <td>
-                {{ advisory.name }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.tracking_id') }}</th>
-              <td>{{ advisory.trackingID }}</td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.version') }}</th>
-              <td>{{ advisory.trackingVersion }}</td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.last_fetched') }}</th>
-              <td>{{ formatDate(advisory.lastFetched) }}</td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.url') }}</th>
-              <td>
-                <a :href="advisory.url" target="_blank">{{ advisory.url }}</a>
-              </td>
-            </tr>
-          </table>
+        <!-- Advisory Information Card -->
+        <b-card class="mb-3 shadow-sm">
+          <h6 class="card-subtitle mb-3 text-muted">
+            <i class="fa fa-info-circle"></i> {{ $t('message.advisory') }} {{ $t('message.details') }}
+          </h6>
+          <b-row>
+            <b-col md="6">
+              <dl class="row mb-0">
+                <dt class="col-sm-4 text-muted">
+                  <i class="fa fa-tag"></i> {{ $t('admin.name') }}
+                </dt>
+                <dd class="col-sm-8">
+                  <strong>{{ advisory.name }}</strong>
+                </dd>
+                
+                <dt class="col-sm-4 text-muted">
+                  <i class="fa fa-code-branch"></i> {{ $t('admin.version') }}
+                </dt>
+                <dd class="col-sm-8">{{ advisory.version }}</dd>
+              </dl>
+            </b-col>
+            <b-col md="6">
+              <dl class="row mb-0">
+                <dt class="col-sm-4 text-muted">
+                  <i class="fa fa-clock-o"></i> {{ $t('admin.last_fetched') }}
+                </dt>
+                <dd class="col-sm-8">{{ formatDate(advisory.lastFetched) }}</dd>
+                
+                <dt class="col-sm-4 text-muted">
+                  <i class="fa fa-link"></i> {{ $t('admin.url') }}
+                </dt>
+                <dd class="col-sm-8">
+                  <a :href="advisory.url" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">
+                    {{ advisory.url }} <i class="fa fa-external-link"></i>
+                  </a>
+                </dd>
+              </dl>
+            </b-col>
+          </b-row>
         </b-card>
-        <b-card :title="$t('admin.publisher')">
-          <table>
-            <tr>
-              <th>{{ $t('admin.name') }}</th>
-              <td>
-                {{ doc.document.publisher.name }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.namespace') }}</th>
-              <td>
-                {{ doc.document.publisher.namespace }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('admin.category') }}</th>
-              <td>
-                {{ doc.document.publisher.category }}
-              </td>
-            </tr>
-          </table>
+
+        <!-- Publisher Information Card -->
+        <b-card class="mb-3 shadow-sm">
+          <h6 class="card-subtitle mb-3 text-muted">
+            <i class="fa fa-building"></i> {{ $t('admin.publisher') }}
+          </h6>
+          <b-row>
+            <b-col md="4">
+              <dl class="mb-0">
+                <dt class="text-muted small">{{ $t('admin.name') }}</dt>
+                <dd><strong>{{ doc.document.publisher.name }}</strong></dd>
+              </dl>
+            </b-col>
+            <b-col md="4">
+              <dl class="mb-0">
+                <dt class="text-muted small">{{ $t('admin.namespace') }}</dt>
+                <dd><code>{{ doc.document.publisher.namespace }}</code></dd>
+              </dl>
+            </b-col>
+            <b-col md="4">
+              <dl class="mb-0">
+                <dt class="text-muted small">{{ $t('admin.category') }}</dt>
+                <dd>
+                  <b-badge variant="primary">{{ doc.document.publisher.category }}</b-badge>
+                </dd>
+              </dl>
+            </b-col>
+          </b-row>
         </b-card>
+        <!-- Notes Cards -->
         <b-card
-          :title="value.category"
           v-for="(value, key) in doc.document.notes"
           :key="key"
+          class="mb-3 shadow-sm"
         >
-          <b-card-text>
-            {{ value.text }}
-          </b-card-text>
+          <h6 class="card-subtitle mb-2">
+            <i class="fa fa-file-text-o"></i> {{ value.category }}
+          </h6>
+          <p class="card-text mb-0" style="white-space: pre-wrap;">{{ value.text }}</p>
         </b-card>
-        <b-card :title="$t('admin.statistics')">
-          <table>
-            <tr>
-              <th>Affected Projects</th>
-              <td>{{ nProjects }}</td>
-            </tr>
-            <tr>
-              <th>Affected Components</th>
-              <td>
-                {{ nComponents }}
-              </td>
-            </tr>
-          </table>
+
+        <!-- Statistics Card -->
+        <b-card class="mb-3 shadow-sm">
+          <h6 class="card-subtitle mb-3 text-muted">
+            <i class="fa fa-bar-chart"></i> {{ $t('admin.statistics') }}
+          </h6>
+          <b-row>
+            <b-col md="6">
+              <div class="stat-box text-center p-3 mb-3 mb-md-0">
+                <div class="stat-icon text-primary mb-2">
+                  <i class="fa fa-cube fa-3x"></i>
+                </div>
+                <div class="stat-value h2 mb-1">{{ nProjects }}</div>
+                <div class="stat-label text-muted">{{ $t('admin.affected_projects') }}</div>
+              </div>
+            </b-col>
+            <b-col md="6">
+              <div class="stat-box text-center p-3">
+                <div class="stat-icon text-success mb-2">
+                  <i class="fa fa-cubes fa-3x"></i>
+                </div>
+                <div class="stat-value h2 mb-1">{{ nComponents }}</div>
+                <div class="stat-label text-muted">{{ $t('admin.affected_components') }}</div>
+              </div>
+            </b-col>
+          </b-row>
         </b-card>
-        <div class="mt-2 d-flex justify-content-end">
+        <!-- JSON View Toggle -->
+        <div class="mt-3 d-flex justify-content-end">
           <b-button
             size="sm"
             variant="outline-secondary"
             @click="showJson = !showJson"
           >
+            <i :class="showJson ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
             {{ showJson ? $t('admin.hide_json') : $t('admin.show_json') }}
           </b-button>
         </div>
         <b-collapse v-model="showJson">
-          <b-card class="mt-2">
-            <pre class="mb-0">{{ JSON.stringify(doc, null, 2) }}</pre>
+          <b-card class="mt-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0"><i class="fa fa-code"></i> Raw JSON Document</h6>
+              <b-button size="sm" variant="outline-primary" @click="copyJson">
+                <i class="fa fa-clipboard"></i> Copy
+              </b-button>
+            </div>
+            <pre class="json-viewer mb-0">{{ JSON.stringify(doc, null, 2) }}</pre>
           </b-card>
         </b-collapse>
       </b-tab>
@@ -103,6 +161,11 @@
           :data="affectedProjects"
           :options="options"
         />
+      </b-tab>
+      <b-tab :title="$t('admin.product_tree')">
+        <b-card>
+          <csaf-product-tree v-if="doc" :content="doc" />
+        </b-card>
       </b-tab>
       <b-tab :title="$t('admin.vulnerabilities')">
         <bootstrap-table
@@ -137,6 +200,7 @@
 import xssFilters from 'xss-filters';
 import common from '../../../shared/common';
 import EventBus from '../../../shared/eventbus';
+import CsafProductTree from '../../administration/vuln-sources/CsafProductTree.vue';
 
 export default {
   props: {
@@ -285,10 +349,26 @@ export default {
       },
     };
   },
+  components: {
+    CsafProductTree,
+  },
   methods: {
     formatDate(value) {
       const date = new Date(value * 1000);
       return date.toLocaleString();
+    },
+    copyJson() {
+      const jsonText = JSON.stringify(this.doc, null, 2);
+      navigator.clipboard.writeText(jsonText).then(() => {
+        this.$toasted.show('JSON copied to clipboard', {
+          type: 'success',
+          icon: 'clipboard',
+        });
+      }).catch(() => {
+        this.$toasted.show('Failed to copy JSON', {
+          type: 'error',
+        });
+      });
     },
     apiUrl: function () {
       let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/${this.advisoryId}`;

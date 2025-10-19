@@ -1,14 +1,8 @@
 <template>
   <b-card no-body :header="header">
     <b-card-body>
-      <c-switch
-        color="primary"
-        id="vulnsourceEnabled"
-        label
-        v-bind="labelIcon"
-        v-model="vulnsourceEnabled"
-        :disabled="!configInitialized"
-      />
+      <c-switch color="primary" id="vulnsourceEnabled" label v-bind="labelIcon" v-model="vulnsourceEnabled"
+        :disabled="!configInitialized" />
       {{ $t('admin.vulnsource_csaf_advisories_enable') }}
       <hr />
       <div>
@@ -18,101 +12,64 @@
               <!--<b-card no-body :header="header">-->
               <b-card-body>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="triggerAll"
-                    :disabled="!vulnsourceEnabled"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="triggerAll"
+                    :disabled="!vulnsourceEnabled || triggerAllDisabled" v-b-tooltip.hover :title="triggerAllTooltip">
                     <span class="fa fa-refresh"></span>
                     {{ $t('admin.trigger_all') }}
                   </b-button>
+                  <small v-if="vulnsourceEnabled" class="text-muted"
+                    style="margin-left:8px; opacity:0.45; font-size:0.75em;">
+                    {{ $t('admin.next_refresh_in') }}
+                    <span v-if="autoRefreshRemainingMs > 0">: {{ formatRemainingMs(autoRefreshRemainingMs) }}</span>
+                    <span v-else>: {{ formatRemainingMs(autoRefreshIntervalMs) }}</span>
+                  </small>
                 </div>
-                <hr
-                  style="
+                <hr style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  "
-                />
+                  " />
                 <h4>{{ $t('admin.csaf_aggregators') }}</h4>
-                <b-button
-                  size="md"
-                  variant="outline-primary"
-                  @click="
-                    $root.$emit('setModalTitle', $t('admin.add_aggregator'))
-                  "
-                  v-b-modal.vulnSourceCSAFAddModal
-                >
+                <b-button size="md" variant="outline-primary" @click="
+                  $root.$emit('setModalTitle', $t('admin.add_aggregator'))
+                  " v-b-modal.vulnSourceCSAFAddModal>
                   <span class="fa fa-plus"></span>
                   {{ $t('admin.add_aggregator') }}
                 </b-button>
-                <bootstrap-table
-                  ref="table_sources"
-                  :columns="srcCols"
-                  :data="srcData"
-                  :options="srcOpts"
-                >
+                <bootstrap-table ref="table_sources" :columns="srcCols" :data="srcData" :options="srcOpts">
                 </bootstrap-table>
-                <hr
-                  style="
+                <hr style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  "
-                />
+                  " />
                 <h4>{{ $t('admin.csaf_providers') }}</h4>
-                <b-button
-                  size="md"
-                  variant="outline-primary"
-                  @click="
-                    $root.$emit('setModalTitle', $t('admin.add_provider'))
-                  "
-                  v-b-modal.vulnSourceCSAFAddModal
-                >
+                <b-button size="md" variant="outline-primary" @click="
+                  $root.$emit('setModalTitle', $t('admin.add_provider'))
+                  " v-b-modal.vulnSourceCSAFAddModal>
                   <span class="fa fa-plus"></span>
                   {{ $t('admin.add_provider') }}
                 </b-button>
-                <bootstrap-table
-                  ref="table_providers"
-                  :columns="provCols"
-                  :data="provData"
-                  :options="provOpts"
-                >
+                <bootstrap-table ref="table_providers" :columns="provCols" :data="provData" :options="provOpts">
                 </bootstrap-table>
-                <hr
-                  style="
+                <hr style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  "
-                />
+                  " />
                 <h4>{{ $t('admin.suggested_discovery_sources') }}</h4>
-                <bootstrap-table
-                  ref="table_suggested"
-                  :columns="recColumns"
-                  :data="recData"
-                  :options="recOptions"
-                  data-click-to-select="true"
-                >
+                <bootstrap-table ref="table_suggested" :columns="recColumns" :data="recData" :options="recOptions"
+                  data-click-to-select="true">
                 </bootstrap-table>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="markReadSuggestions"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="markReadSuggestions">
                     <span class="fa fa-check"></span>
                     {{ $t('admin.mark_selected_read') }}
                   </b-button>
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="addSelected"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="addSelected">
                     <span class="fa fa-plus"></span>
                     {{ $t('admin.add_selected') }}
                   </b-button>
@@ -124,45 +81,24 @@
               <b-card-body>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
                   <!--<h2>{{ $t('admin.csaf_documents') }}:</h2>-->
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    v-b-modal.vulnSourceCSAFUpload
-                  >
+                  <b-button size="md" variant="outline-primary" v-b-modal.vulnSourceCSAFUpload>
                     <span class="fa fa-upload"></span>
                     {{ $t('admin.upload_file') }}
                   </b-button>
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="openCompare"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="openCompare">
                     <span class="fa fa-file"></span>
                     {{ $t('admin.compare_selected') }}
                   </b-button>
                 </div>
-                <bootstrap-table
-                  ref="table_documents"
-                  :columns="docColumns"
-                  :data="docData"
-                  :options="docOpts"
-                  data-click-to-select="true"
-                >
+                <bootstrap-table ref="table_documents" :columns="docColumns" :data="docData" :options="docOpts"
+                  data-click-to-select="true">
                 </bootstrap-table>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="markReadDocuments"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="markReadDocuments">
                     <span class="fa fa-check"></span>
                     {{ $t('admin.mark_selected_read') }}
                   </b-button>
-                  <b-button
-                    size="md"
-                    variant="outline-primary"
-                    @click="deleteSelected"
-                  >
+                  <b-button size="md" variant="outline-primary" @click="deleteSelected">
                     <span class="fa fa-trash"></span>
                     {{ $t('admin.delete_selected') }}
                   </b-button>
@@ -175,18 +111,10 @@
     </b-card-body>
     <b-card-footer></b-card-footer>
     <vuln-source-c-s-a-f-add v-on:refreshTable="refreshBothCsafSourcesTables" />
-    <vuln-source-c-s-a-f-compare
-      :leftTitle="compareLeftTitle"
-      :rightTitle="compareRightTitle"
-      :leftContent="compareLeftContent"
-      :rightContent="compareRightContent"
-    />
+    <vuln-source-c-s-a-f-compare :leftTitle="compareLeftTitle" :rightTitle="compareRightTitle"
+      :leftContent="compareLeftContent" :rightContent="compareRightContent" />
     <vuln-source-c-s-a-f-upload />
     <vuln-source-c-s-a-f-permission />
-    <vuln-source-c-s-a-f-view-doc-modal
-      :title="detailTitle"
-      :content="detailContent"
-    />
   </b-card>
 </template>
 <script>
@@ -197,7 +125,6 @@ import ActionableListGroupItem from '../../components/ActionableListGroupItem.vu
 import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFormInput';
 import VulnSourceCSAFCompare from './VulnSourceCSAFCompare.vue';
 import VulnSourceCSAFUpload from './VulnSourceCSAFUpload.vue';
-import VulnSourceCSAFViewDocModal from './VulnSourceCSAFViewDocModal.vue';
 import VulnSourceCSAFPermission from './VulnSourceCSAFPermission.vue';
 import i18n from '../../../i18n';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
@@ -208,6 +135,22 @@ export default {
   props: {
     header: String,
   },
+  computed: {
+    triggerAllTooltip() {
+      if (this.triggerAllDisabled && this.triggerAllRemainingMs > 0) {
+        const formatted = this.formatRemainingMs(this.triggerAllRemainingMs);
+        const translated = this.$t('admin.trigger_all_cooldown', {
+          remaining: formatted,
+        });
+        // If translation is missing, $t often returns the key; provide fallback
+        if (translated && translated.indexOf('admin.trigger_all_cooldown') === -1) return translated;
+        return `Cooldown: ${formatted}`;
+      }
+      const hint = this.$t('admin.trigger_all_tooltip');
+      if (hint && hint.indexOf('admin.trigger_all_tooltip') === -1) return hint;
+      return 'Click to trigger fetching all CSAF sources';
+    },
+  },
   components: {
     cSwitch,
     VulnSourceCSAFAdd,
@@ -215,7 +158,6 @@ export default {
     BValidatedInputGroupFormInput,
     VulnSourceCSAFCompare,
     VulnSourceCSAFUpload,
-    VulnSourceCSAFViewDocModal,
     VulnSourceCSAFPermission,
   },
   data() {
@@ -224,15 +166,24 @@ export default {
       compareLeftContent: null,
       compareRightTitle: '',
       compareRightContent: null,
-      detailTitle: '',
-      detailContent: null,
       searchTerm: '',
       configInitialized: false,
       vulnsourceEnabled: false,
       vulnsourceToggleInitialized: false,
+      // temporary lockout: disable "Trigger All" button after click (milliseconds)
+      triggerAllDisabled: false,
+      triggerAllTimer: null,
+      // lockout duration for Trigger All (milliseconds). Default 90 seconds.
+      // Will be fetched from the server later via config property
+      // propertyName: 'extension.csaf.trigger_all_lockout_ms'
+      triggerAllLockoutMs: 90 * 1000,
       // automatic refresh configuration (milliseconds)
       autoRefreshIntervalMs: 10000,
       autoRefreshTimer: null,
+      // auto-refresh countdown state
+      autoRefreshNextExpiry: null,
+      autoRefreshCountdownTimer: null,
+      autoRefreshRemainingMs: 0,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -365,13 +316,7 @@ export default {
             return formatVersion(row.version) === maxVersion ? 'Yes' : 'No';
           },
         },
-        {
-          title: 'Actions',
-          field: 'actions',
-          formatter: (value, row) => {
-            return `<button class="btn btn-primary" id="doc-${row.id}"> <span class="fa fa-search-plus"></span> View Details</button>`;
-          },
-        },
+        // Actions column removed: view via title link
       ],
       docData: [],
       docOpts: {
@@ -733,18 +678,7 @@ export default {
     },
   },
   methods: {
-    async showDoc(docId) {
-      const srow = this.$refs.table_documents
-        .getData()
-        .find((item) => item.id.toString() === docId.toString());
-      this.detailTitle = srow.name;
-      const docData = await this.getDocument(docId);
-      // Parse the content property which contains the CSAF JSON as a string
-      this.detailContent = docData && docData.entity && docData.entity.content 
-        ? JSON.parse(docData.entity.content) 
-        : null;
-      this.$bvModal.show('vulnSourceCSAFViewDocModal');
-    },
+    // showDoc removed: navigation goes to advisory detail page via title link
     handleAdd(id) {
       var addRow = this.$refs.table_suggested
         .getData()
@@ -793,22 +727,22 @@ export default {
         alert(this.$t('admin.please_select_two_rows'));
         return;
       }
-      
+
       const leftDoc = await this.getDocument(selectedRows[0].id);
       const rightDoc = await this.getDocument(selectedRows[1].id);
-      
+
       this.compareLeftTitle = selectedRows[0].name;
       // Parse the content property which contains the CSAF JSON as a string
-      this.compareLeftContent = leftDoc && leftDoc.entity && leftDoc.entity.content 
-        ? JSON.parse(leftDoc.entity.content) 
+      this.compareLeftContent = leftDoc && leftDoc.entity && leftDoc.entity.content
+        ? JSON.parse(leftDoc.entity.content)
         : null;
-      
+
       this.compareRightTitle = selectedRows[1].name;
       // Parse the content property which contains the CSAF JSON as a string
-      this.compareRightContent = rightDoc && rightDoc.entity && rightDoc.entity.content 
-        ? JSON.parse(rightDoc.entity.content) 
+      this.compareRightContent = rightDoc && rightDoc.entity && rightDoc.entity.content
+        ? JSON.parse(rightDoc.entity.content)
         : null;
-      
+
       this.$bvModal.show('vulnSourceCSAFCompareModal');
     },
     deleteSelected() {
@@ -873,6 +807,44 @@ export default {
     },
     triggerAll() {
       const url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_TRIGGER}/`;
+      // disable the button for 90 seconds (temporary workaround)
+      try {
+        // set disabled flag immediately so UI reflects action
+        this.triggerAllDisabled = true;
+        // clear any existing timer
+        if (this.triggerAllTimer) {
+          clearTimeout(this.triggerAllTimer);
+          this.triggerAllTimer = null;
+        }
+        // clear any existing countdown interval
+        if (this.triggerAllCountdownTimer) {
+          clearInterval(this.triggerAllCountdownTimer);
+          this.triggerAllCountdownTimer = null;
+        }
+        // set expiry timestamp and initialize remaining ms
+        const now = Date.now();
+        this.triggerAllExpiry = now + this.triggerAllLockoutMs;
+        this.triggerAllRemainingMs = this.triggerAllLockoutMs;
+        // start 1s interval to update remaining ms for tooltip
+        this.triggerAllCountdownTimer = setInterval(() => {
+          const remaining = this.triggerAllExpiry - Date.now();
+          this.triggerAllRemainingMs = remaining > 0 ? remaining : 0;
+          if (remaining <= 0) {
+            clearInterval(this.triggerAllCountdownTimer);
+            this.triggerAllCountdownTimer = null;
+          }
+        }, 1000);
+        // use configured lockout duration
+        this.triggerAllTimer = setTimeout(() => {
+          this.triggerAllDisabled = false;
+          this.triggerAllTimer = null;
+          this.triggerAllExpiry = null;
+          this.triggerAllRemainingMs = 0;
+        }, this.triggerAllLockoutMs);
+      } catch (e) {
+        // noop - defensive
+      }
+
       return this.axios
         .post(url)
         .then((response) => {
@@ -943,6 +915,14 @@ export default {
         },
       ]);
     },
+    // helper to format remaining milliseconds into MM:SS
+    formatRemainingMs(ms) {
+      if (!ms || ms <= 0) return '0:00';
+      const totalSeconds = Math.ceil(ms / 1000);
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    },
     startAutoRefresh() {
       // Prevent duplicate timers
       if (this.autoRefreshTimer) return;
@@ -952,12 +932,46 @@ export default {
         this.refreshProvidersTable();
         this.refreshAggregatorsTable();
       }
+      // set next expiry for the UI countdown
+      this.autoRefreshNextExpiry = Date.now() + this.autoRefreshIntervalMs;
+      this.autoRefreshRemainingMs = this.autoRefreshIntervalMs;
+      // start a 1s countdown interval for the UI
+      if (this.autoRefreshCountdownTimer) {
+        clearInterval(this.autoRefreshCountdownTimer);
+        this.autoRefreshCountdownTimer = null;
+      }
+      this.autoRefreshCountdownTimer = setInterval(() => {
+        const rem = this.autoRefreshNextExpiry - Date.now();
+        this.autoRefreshRemainingMs = rem > 0 ? rem : 0;
+        if (rem <= 0) {
+          // will be reset when the periodic refresh runs
+          clearInterval(this.autoRefreshCountdownTimer);
+          this.autoRefreshCountdownTimer = null;
+        }
+      }, 1000);
+
       this.autoRefreshTimer = setInterval(() => {
         if (!this.vulnsourceEnabled) return;
         try {
           this.refreshCsafSuggestedTable();
           this.refreshProvidersTable();
           this.refreshAggregatorsTable();
+          // reset next expiry after successful run
+          this.autoRefreshNextExpiry = Date.now() + this.autoRefreshIntervalMs;
+          this.autoRefreshRemainingMs = this.autoRefreshIntervalMs;
+          // restart countdown timer
+          if (this.autoRefreshCountdownTimer) {
+            clearInterval(this.autoRefreshCountdownTimer);
+            this.autoRefreshCountdownTimer = null;
+          }
+          this.autoRefreshCountdownTimer = setInterval(() => {
+            const rem = this.autoRefreshNextExpiry - Date.now();
+            this.autoRefreshRemainingMs = rem > 0 ? rem : 0;
+            if (rem <= 0) {
+              clearInterval(this.autoRefreshCountdownTimer);
+              this.autoRefreshCountdownTimer = null;
+            }
+          }, 1000);
         } catch (e) {
           // keep polling even if one refresh fails
           // eslint-disable-next-line no-console
@@ -970,6 +984,12 @@ export default {
         clearInterval(this.autoRefreshTimer);
         this.autoRefreshTimer = null;
       }
+      if (this.autoRefreshCountdownTimer) {
+        clearInterval(this.autoRefreshCountdownTimer);
+        this.autoRefreshCountdownTimer = null;
+      }
+      this.autoRefreshNextExpiry = null;
+      this.autoRefreshRemainingMs = 0;
     },
     updateSourcesTable: function () {
       this.axios.get(this.apiUrl()).then((response) => {
@@ -1005,6 +1025,13 @@ export default {
               this.vulnsourceEnabled = true;
             } else {
               this.vulnsourceToggleInitialized = true; // toggle is initialized
+            }
+            break;
+          case 'extension.csaf.trigger_all_lockout_ms':
+            // allow server to override default lockout in milliseconds
+            const parsed = parseInt(item.propertyValue, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+              this.triggerAllLockoutMs = parsed;
             }
             break;
         }
@@ -1047,12 +1074,6 @@ export default {
     });
     this.$refs.table_documents.$el.addEventListener('click', (event) => {
       const target = event.target;
-      // handle existing View Details button clicks
-      if (target.matches('[id^="doc-"]')) {
-        const docId = target.id.split('-')[1];
-        this.showDoc(docId);
-        return;
-      }
       // handle clicks on title links rendered in the title formatter
       const link = target.closest && target.closest('a.csaf-doc-link');
       if (link) {
@@ -1075,6 +1096,15 @@ export default {
   beforeDestroy() {
     // stop periodic refresh when component is destroyed
     this.stopAutoRefresh();
+    // clear temporary trigger-all timer if present
+    if (this.triggerAllTimer) {
+      clearTimeout(this.triggerAllTimer);
+      this.triggerAllTimer = null;
+    }
+    if (this.triggerAllCountdownTimer) {
+      clearInterval(this.triggerAllCountdownTimer);
+      this.triggerAllCountdownTimer = null;
+    }
     EventBus.$off('admin:csafAggregators:rowUpdated');
     EventBus.$off('admin:csafAggregators:rowDeleted');
     EventBus.$off('admin:csafProviders:rowUpdated');

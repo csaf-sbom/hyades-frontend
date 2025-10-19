@@ -1,36 +1,6 @@
-<template>
-  <b-modal
-    id="vulnSourceCSAFViewDocModal"
-    size="xl"
-    hide-header-close
-    no-stacking
-    :title="title"
-  >
-    <div>
-      <vue-json-pretty :data="content" />
-    </div>
+// This file has been removed from the UI. The advisory detail page is the source of truth now.
+// If you want to fully delete this file from the repository, run:
+// git rm src/views/administration/vuln-sources/VulnSourceCSAFViewDocModal.vue
+// and commit the change.
 
-    <hr />
-
-    <template v-slot:modal-footer="{ cancel }">
-      <b-button size="md" variant="secondary" @click="cancel()">{{
-        $t('message.close')
-      }}</b-button>
-    </template>
-  </b-modal>
-</template>
-
-<script>
-import VueJsonPretty from 'vue-json-pretty';
-import 'vue-json-pretty/lib/styles.css';
-export default {
-  name: 'vulnSourceCSAFViewDocModal',
-  props: {
-    title: String,
-    content: Object,
-  },
-  components: {
-    VueJsonPretty,
-  },
-};
-</script>
+export default {};
