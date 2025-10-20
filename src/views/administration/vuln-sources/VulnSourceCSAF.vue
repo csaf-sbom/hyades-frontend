@@ -17,12 +17,6 @@
                     <span class="fa fa-refresh"></span>
                     {{ $t('admin.trigger_all') }}
                   </b-button>
-                  <small v-if="vulnsourceEnabled" class="text-muted"
-                    style="margin-left:8px; opacity:0.45; font-size:0.75em;">
-                    {{ $t('admin.next_refresh_in') }}
-                    <span v-if="autoRefreshRemainingMs > 0">: {{ formatRemainingMs(autoRefreshRemainingMs) }}</span>
-                    <span v-else>: {{ formatRemainingMs(autoRefreshIntervalMs) }}</span>
-                  </small>
                 </div>
                 <hr style="
                     border: none;

@@ -214,6 +214,7 @@
     "never": "never",
     "new_api_key": "This is the newly generated API key. Please note that it will only be displayed once and cannot be retrieved later.",
     "new_api_key_title": "New API Key",
+    "next_refresh_in": "Next Refresh In",
     "nixpkgs": "Nixpkgs",
     "no_file_selected": "No file selected",
     "notification_level": "Notification level",

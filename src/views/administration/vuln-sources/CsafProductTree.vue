@@ -275,7 +275,7 @@ export default {
         <div :style="{ marginLeft: (level * 1.5) + 'rem' }" class="my-2">
           <div class="p-3 bg-dark text-white border rounded cursor-pointer" @click="toggle">
             <div class="d-flex align-items-center flex-wrap">
-                <span class="node-expand-icon" v-if="hasChildren">
+                <span class="node-expand-icon mx-2" v-if="hasChildren">
                     <i :class="isExpanded ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"></i>
                 </span>
                 <span class="node-expand-icon placeholder" v-else></span>
