@@ -1,8 +1,14 @@
 <template>
   <b-card no-body :header="header">
     <b-card-body>
-      <c-switch color="primary" id="vulnsourceEnabled" label v-bind="labelIcon" v-model="vulnsourceEnabled"
-        :disabled="!configInitialized" />
+      <c-switch
+        color="primary"
+        id="vulnsourceEnabled"
+        label
+        v-bind="labelIcon"
+        v-model="vulnsourceEnabled"
+        :disabled="!configInitialized"
+      />
       {{ $t('admin.vulnsource_csaf_advisories_enable') }}
       <hr />
       <div>
@@ -12,58 +18,103 @@
               <!--<b-card no-body :header="header">-->
               <b-card-body>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button size="md" variant="outline-primary" @click="triggerAll"
-                    :disabled="!vulnsourceEnabled || triggerAllDisabled" v-b-tooltip.hover :title="triggerAllTooltip">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="triggerAll"
+                    :disabled="!vulnsourceEnabled || triggerAllDisabled"
+                    v-b-tooltip.hover
+                    :title="triggerAllTooltip"
+                  >
                     <span class="fa fa-refresh"></span>
                     {{ $t('admin.trigger_all') }}
                   </b-button>
                 </div>
-                <hr style="
+                <hr
+                  style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  " />
+                  "
+                />
                 <h4>{{ $t('admin.csaf_aggregators') }}</h4>
-                <b-button size="md" variant="outline-primary" @click="
-                  $root.$emit('setModalTitle', $t('admin.add_aggregator'))
-                  " v-b-modal.vulnSourceCSAFAddModal>
+                <b-button
+                  size="md"
+                  variant="outline-primary"
+                  @click="
+                    $root.$emit('setModalTitle', $t('admin.add_aggregator'))
+                  "
+                  v-b-modal.vulnSourceCSAFAddModal
+                >
                   <span class="fa fa-plus"></span>
                   {{ $t('admin.add_aggregator') }}
                 </b-button>
-                <bootstrap-table ref="table_sources" :columns="srcCols" :data="srcData" :options="srcOpts">
+                <bootstrap-table
+                  ref="table_sources"
+                  :columns="srcCols"
+                  :data="srcData"
+                  :options="srcOpts"
+                >
                 </bootstrap-table>
-                <hr style="
+                <hr
+                  style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  " />
+                  "
+                />
                 <h4>{{ $t('admin.csaf_providers') }}</h4>
-                <b-button size="md" variant="outline-primary" @click="
-                  $root.$emit('setModalTitle', $t('admin.add_provider'))
-                  " v-b-modal.vulnSourceCSAFAddModal>
+                <b-button
+                  size="md"
+                  variant="outline-primary"
+                  @click="
+                    $root.$emit('setModalTitle', $t('admin.add_provider'))
+                  "
+                  v-b-modal.vulnSourceCSAFAddModal
+                >
                   <span class="fa fa-plus"></span>
                   {{ $t('admin.add_provider') }}
                 </b-button>
-                <bootstrap-table ref="table_providers" :columns="provCols" :data="provData" :options="provOpts">
+                <bootstrap-table
+                  ref="table_providers"
+                  :columns="provCols"
+                  :data="provData"
+                  :options="provOpts"
+                >
                 </bootstrap-table>
-                <hr style="
+                <hr
+                  style="
                     border: none;
                     height: 1px;
                     background-color: #007bff;
                     margin: 10px 0;
-                  " />
+                  "
+                />
                 <h4>{{ $t('admin.suggested_discovery_sources') }}</h4>
-                <bootstrap-table ref="table_suggested" :columns="recColumns" :data="recData" :options="recOptions"
-                  data-click-to-select="true">
+                <bootstrap-table
+                  ref="table_suggested"
+                  :columns="recColumns"
+                  :data="recData"
+                  :options="recOptions"
+                  data-click-to-select="true"
+                >
                 </bootstrap-table>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button size="md" variant="outline-primary" @click="markReadSuggestions">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="markReadSuggestions"
+                  >
                     <span class="fa fa-check"></span>
                     {{ $t('admin.mark_selected_read') }}
                   </b-button>
-                  <b-button size="md" variant="outline-primary" @click="addSelected">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="addSelected"
+                  >
                     <span class="fa fa-plus"></span>
                     {{ $t('admin.add_selected') }}
                   </b-button>
@@ -75,24 +126,45 @@
               <b-card-body>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
                   <!--<h2>{{ $t('admin.csaf_documents') }}:</h2>-->
-                  <b-button size="md" variant="outline-primary" v-b-modal.vulnSourceCSAFUpload>
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    v-b-modal.vulnSourceCSAFUpload
+                  >
                     <span class="fa fa-upload"></span>
                     {{ $t('admin.upload_file') }}
                   </b-button>
-                  <b-button size="md" variant="outline-primary" @click="openCompare">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="openCompare"
+                  >
                     <span class="fa fa-file"></span>
                     {{ $t('admin.compare_selected') }}
                   </b-button>
                 </div>
-                <bootstrap-table ref="table_documents" :columns="docColumns" :data="docData" :options="docOpts"
-                  data-click-to-select="true">
+                <bootstrap-table
+                  ref="table_documents"
+                  :columns="docColumns"
+                  :data="docData"
+                  :options="docOpts"
+                  data-click-to-select="true"
+                >
                 </bootstrap-table>
                 <div id="repositoryToolbar" class="bs-table-custom-toolbar">
-                  <b-button size="md" variant="outline-primary" @click="markReadDocuments">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="markReadDocuments"
+                  >
                     <span class="fa fa-check"></span>
                     {{ $t('admin.mark_selected_read') }}
                   </b-button>
-                  <b-button size="md" variant="outline-primary" @click="deleteSelected">
+                  <b-button
+                    size="md"
+                    variant="outline-primary"
+                    @click="deleteSelected"
+                  >
                     <span class="fa fa-trash"></span>
                     {{ $t('admin.delete_selected') }}
                   </b-button>
@@ -105,13 +177,18 @@
     </b-card-body>
     <b-card-footer></b-card-footer>
     <vuln-source-c-s-a-f-add v-on:refreshTable="refreshBothCsafSourcesTables" />
-    <vuln-source-c-s-a-f-compare :leftTitle="compareLeftTitle" :rightTitle="compareRightTitle"
-      :leftContent="compareLeftContent" :rightContent="compareRightContent" />
+    <vuln-source-c-s-a-f-compare
+      :leftTitle="compareLeftTitle"
+      :rightTitle="compareRightTitle"
+      :leftContent="compareLeftContent"
+      :rightContent="compareRightContent"
+    />
     <vuln-source-c-s-a-f-upload />
     <vuln-source-c-s-a-f-permission />
   </b-card>
 </template>
 <script>
+import Vue from 'vue';
 import { Switch as cSwitch } from '@coreui/vue';
 import configPropertyMixin from '../mixins/configPropertyMixin';
 import VulnSourceCSAFAdd from './VulnSourceCSAFAddModal.vue';
@@ -120,6 +197,7 @@ import BValidatedInputGroupFormInput from '../../../forms/BValidatedInputGroupFo
 import VulnSourceCSAFCompare from './VulnSourceCSAFCompare.vue';
 import VulnSourceCSAFUpload from './VulnSourceCSAFUpload.vue';
 import VulnSourceCSAFPermission from './VulnSourceCSAFPermission.vue';
+import VulnSourceCSAFSourceEdit from './VulnSourceCSAFSourceEdit.vue';
 import i18n from '../../../i18n';
 import bootstrapTableMixin from '../../../mixins/bootstrapTableMixin';
 import EventBus from '../../../shared/eventbus';
@@ -137,7 +215,11 @@ export default {
           remaining: formatted,
         });
         // If translation is missing, $t often returns the key; provide fallback
-        if (translated && translated.indexOf('admin.trigger_all_cooldown') === -1) return translated;
+        if (
+          translated &&
+          translated.indexOf('admin.trigger_all_cooldown') === -1
+        )
+          return translated;
         return `Cooldown: ${formatted}`;
       }
       const hint = this.$t('admin.trigger_all_tooltip');
@@ -153,6 +235,7 @@ export default {
     VulnSourceCSAFCompare,
     VulnSourceCSAFUpload,
     VulnSourceCSAFPermission,
+    VulnSourceCSAFSourceEdit,
   },
   data() {
     return {
@@ -171,13 +254,15 @@ export default {
       // Will be fetched from the server later via config property
       // propertyName: 'extension.csaf.trigger_all_lockout_ms'
       triggerAllLockoutMs: 90 * 1000,
+      // trigger all countdown state
+      triggerAllExpiry: null,
+      triggerAllCountdownTimer: null,
+      triggerAllRemainingMs: 0,
       // automatic refresh configuration (milliseconds)
       autoRefreshIntervalMs: 10000,
       autoRefreshTimer: null,
-      // auto-refresh countdown state
-      autoRefreshNextExpiry: null,
-      autoRefreshCountdownTimer: null,
-      autoRefreshRemainingMs: 0,
+      // track if any row is expanded (edit form is open)
+      isAnyRowExpanded: false,
       labelIcon: {
         dataOn: '\u2713',
         dataOff: '\u2715',
@@ -404,6 +489,9 @@ export default {
         detailViewIcon: false,
         detailViewByClick: true,
         onExpandRow: this.vueFormatterInit,
+        onCollapseRow: (index, row) => {
+          this.isAnyRowExpanded = false;
+        },
         onLoadError: (status, res) => {
           if (status === 403) {
             this.$bvModal.show('vulnSourceCSAFPermission');
@@ -412,86 +500,15 @@ export default {
         detailFormatter: (index, row) => {
           return this.vueFormatter({
             i18n,
-            template: `
-                <b-row class="expanded-row">
-                  <b-col sm="12">
-                    <b-form-group :label="$t('admin.name')">
-                      <b-form-input type="text" v-model="name" required />
-                    </b-form-group>
-                    <b-form-group :label="$t('admin.url')">
-                      <b-form-input type="url" v-model="surl" required />
-                    </b-form-group>
-                    <div class="mb-2">
-                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" /> {{$t('admin.enabled')}}
-                    </div>
-                    <div class="text-right">
-                      <b-button variant="outline-danger" @click="deleteCsafSource">Delete CSAF source</b-button>
-                      <b-button class="ml-2" variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
-                      <b-button class="ml-2" variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
-                    </div>
-                  </b-col>
-                </b-row>
-            `,
+            template: `<vuln-source-c-s-a-f-source-edit :source="source" :index="index" source-type="aggregator" />`,
             components: {
-              cSwitch,
-              BValidatedInputGroupFormInput,
+              VulnSourceCSAFSourceEdit,
             },
             data() {
               return {
-                csafEntry: row,
-                sid: row.id,
-                name: row.name,
-                surl: row.url,
-                enabled: row.enabled,
-                lastFetched: row.lastFetched,
-                labelIcon: {
-                  dataOn: '\u2713',
-                  dataOff: '\u2715',
-                },
+                source: row,
+                index: index,
               };
-            },
-            methods: {
-              deleteCsafSource: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}/${this.sid}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    EventBus.$emit('admin:csafAggregators:rowDeleted', index);
-                    this.$toastr.s(this.$t('admin.csaf_source_deleted'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
-              resetFetched() {
-                this.lastFetched = null;
-                this.updateCsafSource().then(() => {
-                  EventBus.$emit('refreshAggregatorsTable');
-                });
-              },
-              updateCsafSource: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}`;
-                return this.axios
-                  .post(url, {
-                    id: this.sid,
-                    url: this.surl,
-                    name: this.name,
-                    enabled: this.enabled,
-                    lastFetched: this.lastFetched,
-                  })
-                  .then((response) => {
-                    this.csafEntry = response.data;
-                    EventBus.$emit(
-                      'admin:csafAggregators:rowUpdate',
-                      index,
-                      this.csafEntry,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
             },
           });
         },
@@ -567,89 +584,21 @@ export default {
         detailViewIcon: false,
         detailViewByClick: true,
         onExpandRow: this.vueFormatterInit,
+        onCollapseRow: (index, row) => {
+          this.isAnyRowExpanded = false;
+        },
         detailFormatter: (index, row) => {
           return this.vueFormatter({
             i18n,
-            template: `
-                <b-row class="expanded-row">
-                  <b-col sm="12">
-                    <b-form-group :label="$t('admin.name')">
-                      <b-form-input type="text" v-model="name" required />
-                    </b-form-group>
-                    <b-form-group :label="$t('admin.url')">
-                      <b-form-input type="url" v-model="url" required />
-                    </b-form-group>
-                    <div class="mb-2">
-                      <c-switch color="primary" v-model="enabled" label v-bind="labelIcon" /> {{$t('admin.enabled')}}
-                    </div>
-                    <div class="text-right">
-                      <b-button variant="outline-danger" @click="deleteCsafSource">Delete CSAF source</b-button>
-                      <b-button class="ml-2" variant="outline-danger" @click="resetFetched">Reset last fetched</b-button>
-                      <b-button class="ml-2" variant="outline-primary" @click="updateCsafSource">Save changes</b-button>
-                    </div>
-                  </b-col>
-                </b-row>
-            `,
+            template: `<vuln-source-c-s-a-f-source-edit :source="source" :index="index" source-type="provider" />`,
             components: {
-              cSwitch,
-              BValidatedInputGroupFormInput,
+              VulnSourceCSAFSourceEdit,
             },
             data() {
               return {
-                csafEntry: row,
-                id: row.id,
-                name: row.name,
-                url: row.url,
-                enabled: row.enabled,
-                lastFetched: row.lastFetched,
-                labelIcon: {
-                  dataOn: '\u2713',
-                  dataOff: '\u2715',
-                },
+                source: row,
+                index: index,
               };
-            },
-            methods: {
-              deleteCsafSource: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}/${this.id}`;
-                this.axios
-                  .delete(url)
-                  .then((response) => {
-                    EventBus.$emit('admin:csafProviders:rowDeleted', index);
-                    this.$toastr.s(this.$t('admin.csaf_source_deleted'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
-              resetFetched() {
-                this.lastFetched = null;
-                this.updateCsafSource().then(() => {
-                  EventBus.$emit('refreshProvidersTable');
-                });
-              },
-              updateCsafSource: function () {
-                let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
-                return this.axios
-                  .post(url, {
-                    id: this.id,
-                    url: this.url,
-                    name: this.name,
-                    enabled: this.enabled,
-                    lastFetched: this.lastFetched,
-                  })
-                  .then((response) => {
-                    this.csafEntry = response.data;
-                    EventBus.$emit(
-                      'admin:csafProviders:rowUpdate',
-                      index,
-                      this.csafEntry,
-                    );
-                    this.$toastr.s(this.$t('message.updated'));
-                  })
-                  .catch((error) => {
-                    this.$toastr.w(this.$t('condition.unsuccessful_action'));
-                  });
-              },
             },
           });
         },
@@ -672,6 +621,21 @@ export default {
     },
   },
   methods: {
+    // Override vueFormatterInit from mixin to track row expansion
+    vueFormatterInit() {
+      this.isAnyRowExpanded = true;
+      // Call the mixin's vueFormatterInit
+      if (!this.vueFormatters.length) {
+        return;
+      }
+      for (let i = this.vueFormatters.length - 1; i >= 0; i--) {
+        const formatter = this.vueFormatters[i];
+        if (document.getElementsByClassName(formatter.name)) {
+          new Vue(formatter);
+          this.vueFormatters.splice(i, 1);
+        }
+      }
+    },
     // showDoc removed: navigation goes to advisory detail page via title link
     handleAdd(id) {
       var addRow = this.$refs.table_suggested
@@ -727,15 +691,17 @@ export default {
 
       this.compareLeftTitle = selectedRows[0].name;
       // Parse the content property which contains the CSAF JSON as a string
-      this.compareLeftContent = leftDoc && leftDoc.entity && leftDoc.entity.content
-        ? JSON.parse(leftDoc.entity.content)
-        : null;
+      this.compareLeftContent =
+        leftDoc && leftDoc.entity && leftDoc.entity.content
+          ? JSON.parse(leftDoc.entity.content)
+          : null;
 
       this.compareRightTitle = selectedRows[1].name;
       // Parse the content property which contains the CSAF JSON as a string
-      this.compareRightContent = rightDoc && rightDoc.entity && rightDoc.entity.content
-        ? JSON.parse(rightDoc.entity.content)
-        : null;
+      this.compareRightContent =
+        rightDoc && rightDoc.entity && rightDoc.entity.content
+          ? JSON.parse(rightDoc.entity.content)
+          : null;
 
       this.$bvModal.show('vulnSourceCSAFCompareModal');
     },
@@ -920,52 +886,27 @@ export default {
     startAutoRefresh() {
       // Prevent duplicate timers
       if (this.autoRefreshTimer) return;
+
       // Immediately refresh once, then schedule periodic refreshes
       if (this.vulnsourceEnabled) {
         this.refreshCsafSuggestedTable();
         this.refreshProvidersTable();
         this.refreshAggregatorsTable();
       }
-      // set next expiry for the UI countdown
-      this.autoRefreshNextExpiry = Date.now() + this.autoRefreshIntervalMs;
-      this.autoRefreshRemainingMs = this.autoRefreshIntervalMs;
-      // start a 1s countdown interval for the UI
-      if (this.autoRefreshCountdownTimer) {
-        clearInterval(this.autoRefreshCountdownTimer);
-        this.autoRefreshCountdownTimer = null;
-      }
-      this.autoRefreshCountdownTimer = setInterval(() => {
-        const rem = this.autoRefreshNextExpiry - Date.now();
-        this.autoRefreshRemainingMs = rem > 0 ? rem : 0;
-        if (rem <= 0) {
-          // will be reset when the periodic refresh runs
-          clearInterval(this.autoRefreshCountdownTimer);
-          this.autoRefreshCountdownTimer = null;
-        }
-      }, 1000);
 
+      // Set up periodic refresh
       this.autoRefreshTimer = setInterval(() => {
         if (!this.vulnsourceEnabled) return;
+
+        // Skip refresh if any row is expanded (edit form is open)
+        if (this.isAnyRowExpanded) {
+          return;
+        }
+
         try {
           this.refreshCsafSuggestedTable();
           this.refreshProvidersTable();
           this.refreshAggregatorsTable();
-          // reset next expiry after successful run
-          this.autoRefreshNextExpiry = Date.now() + this.autoRefreshIntervalMs;
-          this.autoRefreshRemainingMs = this.autoRefreshIntervalMs;
-          // restart countdown timer
-          if (this.autoRefreshCountdownTimer) {
-            clearInterval(this.autoRefreshCountdownTimer);
-            this.autoRefreshCountdownTimer = null;
-          }
-          this.autoRefreshCountdownTimer = setInterval(() => {
-            const rem = this.autoRefreshNextExpiry - Date.now();
-            this.autoRefreshRemainingMs = rem > 0 ? rem : 0;
-            if (rem <= 0) {
-              clearInterval(this.autoRefreshCountdownTimer);
-              this.autoRefreshCountdownTimer = null;
-            }
-          }, 1000);
         } catch (e) {
           // keep polling even if one refresh fails
           // eslint-disable-next-line no-console
@@ -978,12 +919,6 @@ export default {
         clearInterval(this.autoRefreshTimer);
         this.autoRefreshTimer = null;
       }
-      if (this.autoRefreshCountdownTimer) {
-        clearInterval(this.autoRefreshCountdownTimer);
-        this.autoRefreshCountdownTimer = null;
-      }
-      this.autoRefreshNextExpiry = null;
-      this.autoRefreshRemainingMs = 0;
     },
     updateSourcesTable: function () {
       this.axios.get(this.apiUrl()).then((response) => {
