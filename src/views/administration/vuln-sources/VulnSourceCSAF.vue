@@ -892,6 +892,7 @@ export default {
         this.refreshCsafSuggestedTable();
         this.refreshProvidersTable();
         this.refreshAggregatorsTable();
+        this.refreshCsafDocumentsTable();
       }
 
       // Set up periodic refresh
@@ -907,6 +908,7 @@ export default {
           this.refreshCsafSuggestedTable();
           this.refreshProvidersTable();
           this.refreshAggregatorsTable();
+          this.refreshCsafDocumentsTable();
         } catch (e) {
           // keep polling even if one refresh fails
           // eslint-disable-next-line no-console
