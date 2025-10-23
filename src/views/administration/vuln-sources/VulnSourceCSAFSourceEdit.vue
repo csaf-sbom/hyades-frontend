@@ -65,9 +65,7 @@ export default {
   },
   computed: {
     apiUrl() {
-      return this.sourceType === 'aggregator'
-        ? `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}`
-        : `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
+      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}`;
     },
     deleteApiUrl() {
       return `${this.apiUrl}/${this.id}`;
@@ -97,19 +95,32 @@ export default {
     },
     resetFetched() {
       this.lastFetched = null;
-      this.updateSource().then(() => {
+      this.updateSource(true).then(() => {
         EventBus.$emit(this.refreshEventName);
       });
     },
-    updateSource() {
+    updateSource(resetLastFetched = false) {
+      const payload = {
+        id: this.id,
+        url: this.url,
+        name: this.name,
+        enabled: this.enabled,
+        aggregator: this.sourceType === 'aggregator',
+      };
+      
+      // Handle lastFetched: either reset to null or send existing value as ISO string
+      if (resetLastFetched) {
+        payload.lastFetched = null;
+      } else if (this.source.lastFetched) {
+        // Convert Unix timestamp (seconds) to ISO 8601 date-time string
+        const date = new Date(this.source.lastFetched * 1000);
+        payload.lastFetched = date.toISOString();
+      } else {
+        payload.lastFetched = null;
+      }
+      
       return this.axios
-        .post(this.apiUrl, {
-          id: this.id,
-          url: this.url,
-          name: this.name,
-          enabled: this.enabled,
-          lastFetched: this.lastFetched,
-        })
+        .post(this.apiUrl, payload)
         .then((response) => {
           EventBus.$emit(
             `${this.eventPrefix}:rowUpdate`,

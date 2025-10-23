@@ -654,17 +654,15 @@ export default {
       }
     },
     async updateCsafSource(prow) {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}`;
       try {
         const response = await this.axios.post(url, {
           id: prow.id,
           url: prow.url,
           name: prow.name,
-          discovered: prow.discovered,
-          enabled: prow.enabled,
-          fetchInterval: prow.fetchInterval,
-          aggregator: prow.aggregator,
-          seen: prow.seen,
+          discovered: prow.discovered || false,
+          enabled: prow.enabled || false,
+          aggregator: prow.aggregator || false,
         });
         this.csafEntry = response.data;
         EventBus.$emit(
@@ -827,16 +825,16 @@ export default {
         });
     },
     apiUrl: function () {
-      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}`;
+      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}?type=aggregator`;
     },
     apiProvidersUrl: function () {
-      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
+      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}?type=provider`;
     },
     apiDocsUrl: function () {
       return `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}?format=CSAF`;
     },
     apiDisUrl: function () {
-      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_DISCOVERY}`;
+      return `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}?discovered=true`;
     },
     refreshBothCsafSourcesTables: function () {
       this.refreshAggregatorsTable();

@@ -82,18 +82,16 @@ export default {
       // TODO: Call validation api
     },
     createCsafSource: function () {
-      let url ='';
+      const url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_SOURCES}`;
       const title = this.modalTitle;
-      if (title === this.$t('admin.add_aggregator')) {
-        url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_AGGREGATOR}`;
-      } else {
-        url = `${this.$api.BASE_URL}/${this.$api.URL_CSAF_PROVIDER}`;
-      }
+      const isAggregator = title === this.$t('admin.add_aggregator');
+      
       this.axios
         .put(url, {
           name: this.name,
           url: this.url,
           enabled: this.enabled,
+          aggregator: isAggregator,
         })
         .then((response) => {
           this.$emit('refreshTable');
