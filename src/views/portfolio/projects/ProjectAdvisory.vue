@@ -83,7 +83,7 @@ export default {
   mixins: [permissionsMixin],
   methods: {
     apiUrl: function () {
-      let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/project/${this.projectUuid}/advisory/${this.row.documentId}`;
+      let url = `${this.$api.BASE_URL}/${this.$api.URL_ADVISORIES}/project/${this.projectUuid}/advisory/${encodeURIComponent(this.row.document_id)}`;
       return url;
     },
     refreshTable: function () {

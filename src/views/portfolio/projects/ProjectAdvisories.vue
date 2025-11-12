@@ -44,7 +44,7 @@ export default {
           sortable: true,
           formatter(value, row, index) {
             let url = xssFilters.uriInUnQuotedAttr(
-              '../advisories/' + encodeURIComponent(row.documentId),
+              '../advisories/' + encodeURIComponent(row.document_id),
             );
             return `<a href="${url}">${xssFilters.inHTMLData(value)}</a>`;
           },
