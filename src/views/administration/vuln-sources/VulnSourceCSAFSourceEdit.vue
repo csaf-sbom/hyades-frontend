@@ -106,17 +106,24 @@ export default {
         name: this.name,
         enabled: this.enabled,
         aggregator: this.sourceType === 'aggregator',
+        discovered: this.source.discovered || false,
       };
       
-      // Handle lastFetched: either reset to null or send existing value as ISO string
+      // Handle last_fetched: either reset to null or send existing value as ISO string
       if (resetLastFetched) {
-        payload.lastFetched = null;
+        payload.last_fetched = null;
       } else if (this.source.lastFetched) {
-        // Convert Unix timestamp (seconds) to ISO 8601 date-time string
-        const date = new Date(this.source.lastFetched * 1000);
-        payload.lastFetched = date.toISOString();
+        // Check if lastFetched is already an ISO string or a Unix timestamp
+        if (typeof this.source.lastFetched === 'string') {
+          // Already an ISO string
+          payload.last_fetched = this.source.lastFetched;
+        } else {
+          // Convert Unix timestamp (seconds) to ISO 8601 date-time string
+          const date = new Date(this.source.lastFetched * 1000);
+          payload.last_fetched = date.toISOString();
+        }
       } else {
-        payload.lastFetched = null;
+        payload.last_fetched = null;
       }
       
       return this.axios

@@ -319,6 +319,9 @@ export default {
         silentSort: false,
         sortName: 'seen',
         sortOrder: 'asc',
+        responseHandler: function (res) {
+          return res.data || [];
+        },
         icons: {
           refresh: 'fa-refresh',
         },
@@ -363,14 +366,14 @@ export default {
         },
         {
           title: 'Last fetched',
-          field: 'lastFetched',
+          field: 'last_fetched',
           class: 'tight',
           sortable: true,
           formatter: (value) => {
             if (!value || value <= 0) {
               return this.$t('admin.never');
             }
-            const date = new Date(value * 1000);
+            const date = new Date(value);
             return date.toLocaleString();
           },
         },
@@ -404,7 +407,7 @@ export default {
         showRefresh: true,
         pagination: true,
         sidePagination: 'server',
-        dataField: 'objects',
+        dataField: 'advisories',
         responseHandler: function (res, xhr) {
           res.total = xhr.getResponseHeader('X-Total-Count');
           return res;
@@ -446,14 +449,14 @@ export default {
         },
         {
           title: 'Last fetched',
-          field: 'lastFetched',
+          field: 'last_fetched',
           class: 'tight',
           sortable: true,
           formatter: (value) => {
             if (!value || value <= 0) {
               return this.$t('admin.never');
             }
-            const date = new Date(value * 1000);
+            const date = new Date(value);
             return date.toLocaleString();
           },
         },
@@ -482,6 +485,9 @@ export default {
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
         silentSort: false,
+        responseHandler: function (res) {
+          return res.data || [];
+        },
         icons: {
           refresh: 'fa-refresh',
         },
@@ -540,14 +546,14 @@ export default {
         },
         {
           title: 'Last fetched',
-          field: 'lastFetched',
+          field: 'last_fetched',
           class: 'tight',
           sortable: true,
           formatter: (value) => {
             if (!value || value <= 0) {
               return this.$t('admin.never');
             }
-            const date = new Date(value * 1000);
+            const date = new Date(value);
             return date.toLocaleString();
           },
         },
@@ -577,6 +583,9 @@ export default {
         pageList: '[10, 25, 50, 100]',
         pageSize: 10,
         silentSort: false,
+        responseHandler: function (res) {
+          return res.data || [];
+        },
         icons: {
           refresh: 'fa-refresh',
         },

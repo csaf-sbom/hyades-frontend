@@ -55,7 +55,7 @@ export default {
           sortable: true,
         },
         {
-          field: 'findingsPerDoc',
+          field: 'findings_per_doc',
           title: this.$t('message.affected_components'),
           sortable: true,
         },

@@ -50,7 +50,7 @@
                 <dt class="col-sm-4 text-muted">
                   <i class="fa fa-clock-o"></i> {{ $t('admin.last_fetched') }}
                 </dt>
-                <dd class="col-sm-8">{{ formatDate(advisory.lastFetched) }}</dd>
+                <dd class="col-sm-8">{{ formatDate(advisory.last_fetched) }}</dd>
                 
                 <dt class="col-sm-4 text-muted">
                   <i class="fa fa-link"></i> {{ $t('admin.url') }}
@@ -66,7 +66,7 @@
         </b-card>
 
         <!-- Publisher Information Card -->
-        <b-card class="mb-3">
+        <b-card v-if="doc.document && doc.document.publisher" class="mb-3">
           <h6 class="text-muted font-weight-bold mb-3">
             <i class="fa fa-building"></i> {{ $t('admin.publisher') }}
           </h6>
@@ -94,16 +94,18 @@
           </b-row>
         </b-card>
         <!-- Notes Cards -->
-        <b-card
-          v-for="(value, key) in doc.document.notes"
-          :key="key"
-          class="mb-3"
-        >
-          <h6 class="font-weight-bold mb-2">
-            <i class="fa fa-file-text-o"></i> {{ value.category }}
-          </h6>
-          <p class="mb-0" style="white-space: pre-wrap;">{{ value.text }}</p>
-        </b-card>
+        <template v-if="doc.document && doc.document.notes">
+          <b-card
+            v-for="(value, key) in doc.document.notes"
+            :key="key"
+            class="mb-3"
+          >
+            <h6 class="font-weight-bold mb-2">
+              <i class="fa fa-file-text-o"></i> {{ value.category }}
+            </h6>
+            <p class="mb-0" style="white-space: pre-wrap;">{{ value.text }}</p>
+          </b-card>
+        </template>
 
         <!-- Statistics Card -->
         <b-card class="mb-3">
@@ -224,7 +226,7 @@ export default {
       nProjects: 0,
       nComponents: 0,
       advisory: {},
-      doc: {},
+      doc: { document: null },
       projectsColumns: [
         {
           title: this.$t('admin.name'),
@@ -254,7 +256,7 @@ export default {
       vulnerabilitiesColumns: [
         {
           title: this.$t('message.name'),
-          field: 'vulnId',
+          field: 'vuln_id',
           sortable: true,
           formatter(value, row, index) {
             let url = xssFilters.uriInUnQuotedAttr(
@@ -405,7 +407,7 @@ export default {
   },
   methods: {
     formatDate(value) {
-      const date = new Date(value * 1000);
+      const date = new Date(value);
       return date.toLocaleString();
     },
     copyJson() {
@@ -431,20 +433,25 @@ export default {
       }
       this.axios.get(this.apiUrl()).then((response) => {
         this.advisory = response.data.entity;
-        this.nProjects = response.data.affectedProjects.length;
-        this.nComponents = response.data.numAffectedComponents;
-        this.doc = JSON.parse(response.data.entity.content);
-        this.affectedProjects = response.data.affectedProjects;
-        this.vulnerabilities = response.data.vulnerabilities;
+        this.nProjects = response.data.affectedProjects?.length || 0;
+        this.nComponents = response.data.numAffectedComponents || 0;
+        this.doc = response.data.entity.content ? JSON.parse(response.data.entity.content) : { document: null };
+        this.affectedProjects = response.data.affectedProjects || [];
+        this.vulnerabilities = response.data.vulnerabilities || [];
         EventBus.$emit('addCrumb', this.advisory.name);
         this.$title = this.advisory.name;
-        this.historyData = this.doc.document.tracking.revision_history.map(
-          (item) => ({
-            date: item.date,
-            version: item.number,
-            summary: item.summary,
-          }),
-        );
+        // Only process revision history if it exists
+        if (this.doc.document && this.doc.document.tracking && this.doc.document.tracking.revision_history) {
+          this.historyData = this.doc.document.tracking.revision_history.map(
+            (item) => ({
+              date: item.date,
+              version: item.number,
+              summary: item.summary,
+            }),
+          );
+        } else {
+          this.historyData = [];
+        }
       });
     },
     routeTo(path) {

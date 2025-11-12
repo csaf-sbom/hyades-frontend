@@ -73,12 +73,12 @@ export default {
         },
         {
           title: this.$t('admin.projects'),
-          field: 'affectedProjects',
+          field: 'affected_projects',
           sortable: true,
         },
         {
           title: this.$t('admin.matches'),
-          field: 'affectedComponents',
+          field: 'affected_components',
           sortable: true,
         },
       ],
